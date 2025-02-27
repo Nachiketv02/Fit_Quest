@@ -28,6 +28,30 @@ const userSchema = new mongoose.Schema({
     password : {
         type : String,
         required : true
+    },
+    isVerified : {
+        type : Boolean,
+        default : false
+    },
+    verificationCode : {
+        type : Number,
+    },
+    verificationCodeExpires : {
+        type : Date,
+        // default : Date.now,
+        // expires : 86400
+    },
+    resetPasswordToken : {
+        type : String,
+    },
+    resetPasswordTokenExpires : {
+        type : Date,
+        // default : Date.now,
+        // expires : 86400
+    },
+    createdAt : {
+        type : Date,
+        default : Date.now
     }
 });
 
@@ -46,8 +70,10 @@ userSchema.statics.hashPassword = async function(password) {
     return await bcrypt.hash(password, 10);
 }
 
-userSchema.static.generateOTP = async function(){
+userSchema.methods.generateVerificationCode = async function(){
     const code = crypto.randomInt(Math.pow(10, 5),Math.pow(10, 6)).toString();
+    this.verificationCode = code;
+    this.verificationCodeExpires = Date.now() + 5 * 60 * 1000; //5 minutes
     return code;
 }
 

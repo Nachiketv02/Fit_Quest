@@ -1,41 +1,233 @@
 const userModel = require("../model/user.model");
 const userService = require("../service/user.service");
+const { validationResult } = require("express-validator");
+const { sendEmail } = require("../utils/sendEmail");
 
 module.exports.signupUser = async (req, res) => {
-    try{
-        const {fullName, email, phone, gender, password} = req.body;
-        if(!fullName || !email || !phone || !gender || !password){
-            res.status(400).json({ error: "All fields are required" });
-            return;
-        }
-        const existingUser = await userModel.findOne({ 
-            $or: [
-                { email },
-                { phone }
-            ]
-        });
-        if(existingUser){
-            res.status(400).json({ error: "User already exists" });
-            return;
-        }
-
-        const hashedPassword = await userModel.hashPassword(password);
-
-        const user = await userService.signupUser({
-            fullName,
-            email,
-            phone,
-            gender,
-            password: hashedPassword
-        });
-
-        const token = user.generateAuthToken();
-        res.cookie("token", token);
-
-        res.status(201).json({ message: "User created successfully" , user});
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-    catch(error){
-        console.log("Error in signupUser Controller :",error.message);
-        res.status(500).json({ error: error.message });
+    const { fullName, email, phone, gender, password } = req.body;
+    if (!fullName || !email || !phone || !gender || !password) {
+      res.status(400).json({ error: "All fields are required" });
+      return;
     }
+    const existingUser = await userModel.findOne({
+      $or: [{ email }, { phone }],
+    });
+    if (existingUser) {
+      res.status(400).json({ error: "User already exists" });
+      return;
+    }
+
+    const hashedPassword = await userModel.hashPassword(password);
+
+    const user = await userService.signupUser({
+      fullName,
+      email,
+      phone,
+      gender,
+      password: hashedPassword,
+    });
+
+    const verificationCode = await user.generateVerificationCode();
+    await userModel.findByIdAndUpdate(user._id, { verificationCode });
+
+    sendVerificationEmail(verificationCode, email, user.fullName, res);
+  } catch (error) {
+    if (error.response) {
+      console.log("Error Data:", error.response.data);
+      console.log("Error Status:", error.response.status);
+    } else {
+      console.log("Error:", error.message);
+    }
+  }
+};
+
+function generateEmailVerificationLink(verificationCode , fullName) {
+    return `<!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Your Verification Code</title>
+      <style>
+        /* Base styles */
+        body {
+          margin: 0;
+          padding: 0;
+          background-color: #121212;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          color: #e0e0e0;
+          -webkit-font-smoothing: antialiased;
+        }
+        
+        .container {
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        
+        .email-wrapper {
+          background-color: #1e1e1e;
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+        }
+        
+        .header {
+          background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+          padding: 30px 20px;
+          text-align: center;
+        }
+        
+        .logo {
+          width: 120px;
+          height: 40px;
+          background-color: rgba(255, 255, 255, 0.2);
+          border-radius: 8px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: bold;
+          letter-spacing: 1px;
+        }
+        
+        .content {
+          padding: 30px 40px;
+        }
+        
+        h1 {
+          color: white;
+          font-size: 24px;
+          font-weight: 600;
+          margin-top: 0;
+          margin-bottom: 20px;
+        }
+        
+        p {
+          font-size: 16px;
+          line-height: 1.6;
+          color: #b0b0b0;
+          margin-bottom: 24px;
+        }
+        
+        .otp-container {
+          background-color: #252525;
+          border-radius: 12px;
+          padding: 30px;
+          text-align: center;
+          margin: 30px 0;
+          border: 1px solid #333;
+        }
+        
+        .otp-code {
+          font-family: 'Courier New', monospace;
+          font-size: 36px;
+          font-weight: bold;
+          letter-spacing: 8px;
+          color: #ffffff;
+          background: linear-gradient(90deg, #4f46e5, #7c3aed);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          display: inline-block;
+          padding: 10px 20px;
+        }
+        
+        .expiry {
+          font-size: 14px;
+          color: #888;
+          margin-top: 16px;
+        }
+        
+        .footer {
+          background-color: #171717;
+          padding: 20px;
+          text-align: center;
+          font-size: 12px;
+          color: #666;
+        }
+        
+        .social-links {
+          margin-top: 20px;
+          margin-bottom: 20px;
+        }
+        
+        .social-link {
+          display: inline-block;
+          width: 32px;
+          height: 32px;
+          background-color: #333;
+          border-radius: 50%;
+          margin: 0 8px;
+        }
+        
+        .help-text {
+          margin-top: 30px;
+          padding-top: 20px;
+          border-top: 1px solid #333;
+          font-size: 14px;
+          color: #888;
+        }
+        
+        @media only screen and (max-width: 480px) {
+          .content {
+            padding: 20px;
+          }
+          
+          .otp-container {
+            padding: 20px 10px;
+          }
+          
+          .otp-code {
+            font-size: 28px;
+            letter-spacing: 6px;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="email-wrapper">
+          <div class="content">
+            <h1>Verification Code</h1>
+            <p>Hello ${fullName},</p>
+            <p>We received a request to verify your account. Please use the verification code below to complete the process:</p>
+            
+            <div class="otp-container">
+              <div class="otp-code">${verificationCode}</div>
+              <div class="expiry">This code will expire in 5 minutes</div>
+            </div>
+            
+            <p>If you didn't request this code, you can safely ignore this email. Someone might have typed your email address by mistake.</p>
+            
+            <div class="help-text">
+              <p>Need help? Contact our support team at <a href="mailto:support@fitquest.com" style="color: #4f46e5;">support@fitquest.com</a></p>
+            </div>
+          </div>
+          
+          <div class="footer">
+            <p>© 2025 Fit Quest. All rights reserved.</p>
+            <p>24-458, The Grand Plaza, VIP Road, Vesu, Surat, Gujarat 395007</p>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>`;
+}
+
+async function sendVerificationEmail(verificationCode, email, fullName, res) {
+  try {
+    const message = generateEmailVerificationLink(verificationCode, fullName);
+    sendEmail({ email, subject: "Verification Code", message });
+    res.status(200).json({
+        message: `Verification mail sent to ${fullName}`,
+      });
+  } catch (error) {
+    console.log("Error sending verification email:", error.message);
+  }
 }

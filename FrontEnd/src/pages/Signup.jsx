@@ -1,21 +1,63 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import axios from 'axios';
+import { useContext } from 'react';
+import { UserDataContext } from '../context/UserContext';
 
 function Signup() {
+
+  const navigate = useNavigate();
+
+  const {userData , setUserData} = useContext(UserDataContext)
+
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    phoneNumber: '',
+    phone: '',
     gender: '',
     password: '',
     confirmPassword: '',
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle signup logic here
-    console.log('Signup:', formData);
+
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+    
+    try{
+
+      const newUser = {
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        gender: formData.gender,
+        password: formData.password
+      };
+
+      console.log(newUser);
+      
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/fit-quest/users/signup`,
+        newUser,
+        { headers: { "Content-Type": "application/json" } }
+      );
+      if(response.data.status === 200){
+        const data = response.data;
+        setUserData(data);
+        localStorage.setItem('token', data.token);
+        navigate('/');
+      } else {
+        console.log(response.data.message);
+      }
+      
+      
+    }catch(error){
+      console.log(error.message);
+    }
   };
 
   return (
@@ -71,13 +113,13 @@ function Signup() {
                 Phone Number
               </label>
               <input
-                id="phoneNumber"
-                name="phoneNumber"
+                id="phone"
+                name="phone"
                 type="tel"
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
-                value={formData.phoneNumber}
-                onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               />
             </div>
 

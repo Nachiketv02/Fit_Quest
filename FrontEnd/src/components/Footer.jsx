@@ -25,10 +25,11 @@ function Footer() {
           <div>
             <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
             <ul className="space-y-2 text-gray-300">
-              <li>123 Fitness Street</li>
-              <li>New York, NY 10001</li>
-              <li>Phone: (555) 123-4567</li>
+              <li>24-458, The Grand Plaza</li>
+              <li>VIP Road, Vesu, Surat, Gujarat 395007</li>
+              <li>Phone: +91 9517532584</li>
               <li>Email: info@fitquest.com</li>
+              {/* 24-458, The Grand Plaza, VIP Road, Vesu, Surat, Gujarat 395007 */}
             </ul>
           </div>
           
