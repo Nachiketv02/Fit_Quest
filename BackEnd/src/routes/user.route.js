@@ -11,6 +11,7 @@ router.post("/signup", [
     body("password").isLength({ min: 6 })
 ],userController.signupUser);
 
+router.post("/verify",userController.verifyUser);
 
 
 module.exports = router;

@@ -2,6 +2,7 @@ const userModel = require("../model/user.model");
 const userService = require("../service/user.service");
 const { validationResult } = require("express-validator");
 const { sendEmail } = require("../utils/sendEmail");
+const {sendToken} = require("../utils/sendToken");
 
 module.exports.signupUser = async (req, res) => {
   try {
@@ -230,4 +231,38 @@ async function sendVerificationEmail(verificationCode, email, fullName, res) {
   } catch (error) {
     console.log("Error sending verification email:", error.message);
   }
+}
+
+module.exports.verifyUser = async (req, res) => {
+    try{
+
+        const {email, verificationCode} = req.body;
+
+        if(!email || !verificationCode){
+            res.status(400).json({error : "All fields are required"});
+        }
+
+        const user = await userModel.findOne({email : email , isVerified : false}).sort({createdAt : -1});
+        if(!user){
+            res.status(400).json({error : "User not found"});
+        }
+
+        if(user.verificationCode !== verificationCode){
+            res.status(400).json({error : "Invalid verification code"});
+        }
+
+        if(user.verificationCodeExpires < Date.now()){
+            res.status(400).json({error : "Verification code expired"});
+        }
+
+        user.isVerified = true;
+        user.verificationCode = undefined;
+        user.verificationCodeExpires = undefined;
+        await user.save();
+
+        sendToken(user,200,"User verified successfully",res);
+    } catch(error){
+        console.log("Error in verifyUser Controller :",error.message);
+        res.status(500).json({error : error.message});
+    }
 }

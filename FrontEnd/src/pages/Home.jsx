@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { FiTarget, FiUsers, FiAward, FiClock, FiHeart, FiActivity } from 'react-icons/fi';
+import {useNavigate} from 'react-router-dom';
 
 function Home() {
   const fadeIn = {
@@ -7,6 +8,8 @@ function Home() {
     animate: { opacity: 1, y: 0 },
     transition: { duration: 0.6 }
   };
+
+  const navigate = useNavigate();
 
   return (
     <div className="overflow-hidden">
@@ -50,6 +53,9 @@ function Home() {
                 className="btn-primary"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                navigate('/login');
+                }}
               >
                 Start Your Journey
               </motion.button>
