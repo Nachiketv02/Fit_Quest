@@ -9,6 +9,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import LearnMore from './pages/LearnMore';
 import OtpVerification from './pages/OtpVerification';
 import Classes from './pages/Classes';
+import Trainers from './pages/Trainers';
+import Schedule from './pages/Schedule';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           <Route path="/learnmore" element={<LearnMore />} />
           <Route path="/verify" element={<OtpVerification />} />
           <Route path="/classes" element={<Classes />} />
+          <Route path="/trainers" element={<Trainers />} />
+          <Route path="/schedule" element={<Schedule />} />
         </Routes>
         <Footer />
       </div>

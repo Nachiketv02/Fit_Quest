@@ -15,6 +15,12 @@ router.post("/verify",userController.verifyUser);
 
 router.post('/resend',userController.resendVerificationCode);
 
+router.post('/login',[
+    body("email").isEmail().withMessage("Please enter a valid email"),
+    body("password").isLength({ min: 6 }).withMessage("Password must be at least 6 characters")
+],userController.loginUser);
 
 
+
+module.exports = router;
 module.exports = router;

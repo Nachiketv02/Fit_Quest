@@ -298,3 +298,44 @@ module.exports.resendVerificationCode = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 }
+
+module.exports.loginUser = async (req, res) => {
+  try{  
+    const error = validationResult(req);
+    if (!error.isEmpty()) {
+      return res.status(400).json({ errors: error.array() });
+    }
+
+    const { email, password } = req.body;
+
+    if(!email || !password){
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const user = await userModel.findOne({ email , isVerified : true });
+    if(!user){
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    const isPasswordValid = await user.comparePassword(password);
+
+    if(!isPasswordValid){
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
+
+    return sendToken(user, 200, "Login successful", res);
+
+  } catch(error){
+    console.log("Error in loginUser Controller:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+module.exports.forgotPassword = async (req, res) => {
+  try{
+    
+  } catch(error){
+    console.log("Error in forgotPassword Controller:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+}

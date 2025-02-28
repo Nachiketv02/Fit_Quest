@@ -1,6 +1,9 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import axios from 'axios';
+import { UserDataContext } from '../context/UserContext';
+import { toast } from 'react-toastify';
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -8,10 +11,38 @@ function Login() {
     password: '',
   });
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+  const { setUserData } = useContext(UserDataContext);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login:', formData);
+
+    try {
+      const user = {
+        email: formData.email,
+        password: formData.password,
+      };
+
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/fit-quest/users/login`, user , { headers: { "Content-Type": "application/json" } },{withCredentials:true});
+      if (response.status === 200) {
+        const data = response.data;
+        setUserData(data);
+        toast.success(response.data.message, { position: 'top-right' });
+        localStorage.setItem('token', data.token);
+        setTimeout(() => {
+          navigate('/learnmore');
+        }, 2000);
+      } else {
+        toast.error(response.data.message, { position: 'top-right' });
+      }
+      setFormData({
+        email: '',
+        password: '',
+      });
+    } catch (error) {
+      console.error('Login Error:', error);
+      toast.error('Login failed! Please try again.', { position: 'top-right' });
+    }
   };
 
   return (
@@ -60,6 +91,16 @@ function Login() {
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               />
             </div>
+          </div>
+
+          {/* Forgot Password Link */}
+          <div className="text-right">
+            <Link
+              to="/forgot-password" // Replace with your forgot password route
+              className="text-sm text-primary hover:text-primary/90"
+            >
+              Forgot Password?
+            </Link>
           </div>
 
           <motion.button
