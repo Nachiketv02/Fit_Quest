@@ -6,6 +6,9 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import LearnMore from './pages/LearnMore';
+import OtpVerification from './pages/OtpVerification';
+import Classes from './pages/Classes';
 
 function App() {
   return (
@@ -16,10 +19,13 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/learnmore" element={<LearnMore />} />
+          <Route path="/verify" element={<OtpVerification />} />
+          <Route path="/classes" element={<Classes />} />
         </Routes>
         <Footer />
       </div>
-      <ToastContainer theme='colored'/>
+      <ToastContainer theme='light'/>
     </Router>
   );
 }

@@ -183,3 +183,11 @@ body {
   focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
   transition-all duration-300;
 }
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

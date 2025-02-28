@@ -63,6 +63,9 @@ function Home() {
                 className="px-8 py-3 rounded-full border-2 border-white text-white hover:bg-white hover:text-gray-900 transition-all duration-300"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  navigate('/learnmore');
+                }}
               >
                 Learn More
               </motion.button>

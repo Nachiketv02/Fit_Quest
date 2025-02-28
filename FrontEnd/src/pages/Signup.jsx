@@ -80,28 +80,28 @@ function Signup() {
         password: formData.password,
       };
   
-      console.log(newUser);
-  
       const response = await axios.post(
         `${import.meta.env.VITE_BASE_URL}/fit-quest/users/signup`,
         newUser,
         { headers: { "Content-Type": "application/json" } }
       );
   
-      if (response.data.status === 200) {
+      if (response.status === 200) {
         const data = response.data;
         setUserData(data);
-        localStorage.setItem('token', data.token);
-        toast.success("Otp sent successfully!", { position: "top-right" });
-        setTimeout(() => navigate('/'), 2000); // Redirect after success
+        toast.success(response.data.message, { position: "top-right" });
+        setTimeout(() => {
+          navigate('/verify', { state: { userData: data.user } });
+        }, 2000);
       } else {
         toast.error(response.data.message, { position: "top-right" });
       }
     } catch (error) {
+      console.error("Signup Error:", error);
       toast.error("Signup failed! Please try again.", { position: "top-right" });
-      console.log(error.message);
     }
   };
+  
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
@@ -236,6 +236,7 @@ function Signup() {
             whileTap={{ scale: 0.98 }}
             type="submit"
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+            
           >
             Create Account
           </motion.button>

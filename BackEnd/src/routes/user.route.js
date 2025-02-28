@@ -13,5 +13,8 @@ router.post("/signup", [
 
 router.post("/verify",userController.verifyUser);
 
+router.post('/resend',userController.resendVerificationCode);
+
+
 
 module.exports = router;

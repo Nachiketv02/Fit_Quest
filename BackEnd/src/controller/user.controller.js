@@ -36,7 +36,8 @@ module.exports.signupUser = async (req, res) => {
     const verificationCode = await user.generateVerificationCode();
     await userModel.findByIdAndUpdate(user._id, { verificationCode });
 
-    sendVerificationEmail(verificationCode, email, user.fullName, res);
+    sendVerificationEmail(verificationCode, user, res);
+
   } catch (error) {
     if (error.response) {
       console.log("Error Data:", error.response.data);
@@ -221,12 +222,13 @@ function generateEmailVerificationLink(verificationCode , fullName) {
     </html>`;
 }
 
-async function sendVerificationEmail(verificationCode, email, fullName, res) {
+async function sendVerificationEmail(verificationCode, user, res) {
   try {
-    const message = generateEmailVerificationLink(verificationCode, fullName);
-    sendEmail({ email, subject: "Verification Code", message });
+    const message = generateEmailVerificationLink(verificationCode, user.fullName);
+    sendEmail({ email: user.email, subject: "Verification Code", message });
     res.status(200).json({
-        message: `Verification mail sent to ${fullName}`,
+        message: `Verification mail sent to ${user.fullName}`,
+        user : user.email
       });
   } catch (error) {
     console.log("Error sending verification email:", error.message);
@@ -234,35 +236,65 @@ async function sendVerificationEmail(verificationCode, email, fullName, res) {
 }
 
 module.exports.verifyUser = async (req, res) => {
-    try{
+  try {
+      const { email, verificationCode } = req.body;
 
-        const {email, verificationCode} = req.body;
+      if (!email || !verificationCode) {
+          return res.status(400).json({ error: "All fields are required" });
+      }
 
-        if(!email || !verificationCode){
-            res.status(400).json({error : "All fields are required"});
-        }
+      const user = await userModel.findOne({ email: email, isVerified: false }).sort({ createdAt: -1 });
 
-        const user = await userModel.findOne({email : email , isVerified : false}).sort({createdAt : -1});
-        if(!user){
-            res.status(400).json({error : "User not found"});
-        }
+      if (!user) {
+          return res.status(400).json({ error: "User not found" });
+      }
 
-        if(user.verificationCode !== verificationCode){
-            res.status(400).json({error : "Invalid verification code"});
-        }
+      if (user.verificationCode !== verificationCode) {
+          return res.status(400).json({ error: "Invalid verification code" });
+      }
 
-        if(user.verificationCodeExpires < Date.now()){
-            res.status(400).json({error : "Verification code expired"});
-        }
+      if (user.verificationCodeExpires < Date.now()) {
+          return res.status(400).json({ error: "Verification code expired" });
+      }
 
-        user.isVerified = true;
-        user.verificationCode = undefined;
-        user.verificationCodeExpires = undefined;
-        await user.save();
+      // Update user verification status
+      user.isVerified = true;
+      user.verificationCode = undefined;
+      user.verificationCodeExpires = undefined;
+      await user.save();
 
-        sendToken(user,200,"User verified successfully",res);
-    } catch(error){
-        console.log("Error in verifyUser Controller :",error.message);
-        res.status(500).json({error : error.message});
+      // Send success response
+      return sendToken(user, 200, "User verified successfully", res);
+  } catch (error) {
+      console.log("Error in verifyUser Controller:", error.message);
+      return res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports.resendVerificationCode = async (req, res) => {
+  try{
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
     }
+    const user = await userModel.findOne({ email: email, isVerified: false });
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
+    const newVerificationCode = await user.generateVerificationCode();
+    user.verificationCode = newVerificationCode;
+    const expirationTime = Date.now() + 10 * 60 * 1000; // 10 min from now
+    user.verificationCodeExpires = expirationTime;
+    await user.save();
+    const message = generateEmailVerificationLink(newVerificationCode, user.fullName);
+    sendEmail({ email: user.email, subject: "Verification Code", message });
+    res.status(200).json({
+        message: `Verification mail sent to ${user.fullName}`,
+        user : user.email
+      });
+  }
+  catch(error){
+    console.log("Error in resendVerificationCode Controller:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
 }
