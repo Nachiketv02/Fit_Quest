@@ -303,12 +303,14 @@ function LearnMore() {
                     />
                   </div>
                 </div>
-                <div className="pt-10 text-center">
+                <div className="h-full pt-10 text-center flex flex-col justify-between">
                   <p className="text-gray-600 italic mb-6">
                     "{testimonial.quote}"
                   </p>
+                  <div>
                   <h4 className="font-bold">{testimonial.name}</h4>
                   <p className="text-sm text-gray-500">{testimonial.role}</p>
+                  </div>
                 </div>
               </motion.div>
             ))}

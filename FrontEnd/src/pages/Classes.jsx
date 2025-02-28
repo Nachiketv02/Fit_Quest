@@ -285,70 +285,81 @@ function Classes() {
               >
                 {filteredClasses.map(classItem => (
                   <motion.div
-                    key={classItem.id}
-                    className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
-                    variants={{
-                      initial: { opacity: 0, y: 20 },
-                      animate: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-                    }}
-                  >
-                    <div className="h-48 overflow-hidden relative">
+                  key={classItem.id}
+                  className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow flex flex-col"
+                  variants={{
+                    initial: { opacity: 0, y: 20 },
+                    animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+                  }}
+                >
+                  {/* Image Section */}
+                  <div className="h-48 w-full overflow-hidden relative">
+                    <img 
+                      src={classItem.image} 
+                      alt={classItem.name} 
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    />
+                    <div className="absolute top-0 right-0 bg-primary text-white px-3 py-1 m-3 rounded-full text-sm font-medium">
+                      {classItem.category.charAt(0).toUpperCase() + classItem.category.slice(1)}
+                    </div>
+                  </div>
+                
+                  {/* Card Content */}
+                  <div className="p-6 flex flex-col h-full">
+                    {/* Title */}
+                    <h3 className="text-xl font-bold mb-2">{classItem.name}</h3>
+                
+                    {/* Description (Limited to 2 lines) */}
+                    <p className="text-gray-600 mb-4 line-clamp-2">{classItem.description}</p>
+                
+                    {/* Instructor Section */}
+                    <div className="flex items-center mb-4">
                       <img 
-                        src={classItem.image} 
-                        alt={classItem.name} 
-                        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                        src={classItem.instructorImage} 
+                        alt={classItem.instructor} 
+                        className="w-10 h-10 rounded-full mr-3 object-cover"
                       />
-                      <div className="absolute top-0 right-0 bg-primary text-white px-3 py-1 m-3 rounded-full text-sm font-medium">
-                        {classItem.category.charAt(0).toUpperCase() + classItem.category.slice(1)}
+                      <div>
+                        <p className="text-sm font-medium">{classItem.instructor}</p>
+                        <p className="text-xs text-gray-500">Instructor</p>
                       </div>
                     </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold mb-2">{classItem.name}</h3>
-                      <p className="text-gray-600 mb-4 line-clamp-2">{classItem.description}</p>
-                      
-                      <div className="flex items-center mb-4">
-                        <img 
-                          src={classItem.instructorImage} 
-                          alt={classItem.instructor} 
-                          className="w-10 h-10 rounded-full mr-3 object-cover"
-                        />
-                        <div>
-                          <p className="text-sm font-medium">{classItem.instructor}</p>
-                          <p className="text-xs text-gray-500">Instructor</p>
-                        </div>
+                
+                    {/* Class Details */}
+                    <div className="flex flex-wrap gap-3 mb-4">
+                      <div className="flex items-center text-sm text-gray-600 gap-1">
+                        <FiClock />
+                        {classItem.duration}
                       </div>
-                      
-                      <div className="flex flex-wrap gap-3 mb-4">
-                        <div className="flex items-center text-sm text-gray-600">
-                          <FiClock className="mr-1" />
-                          {classItem.duration}
-                        </div>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <FiUser className="mr-1" />
-                          {classItem.level}
-                        </div>
+                      <div className="flex items-center text-sm text-gray-600 gap-1">
+                        <FiUser />
+                        {classItem.level}
                       </div>
-                      
-                      <div className="border-t pt-4">
-                        <h4 className="font-medium mb-2 flex items-center">
-                          <FiCalendar className="mr-2" />
-                          Schedule
-                        </h4>
-                        <ul className="space-y-1 text-sm">
-                          {classItem.schedule.map((slot, index) => (
-                            <li key={index} className="flex">
-                              <span className="font-medium w-24">{slot.day}:</span>
-                              <span className="text-gray-600">{slot.time}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      
-                      <button className="mt-6 w-full bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-colors">
-                        Book Class
-                      </button>
                     </div>
-                  </motion.div>
+                
+                    {/* Schedule */}
+                    <div className="border-t pt-4">
+                      <h4 className="font-medium mb-2 flex items-center gap-2">
+                        <FiCalendar />
+                        Schedule
+                      </h4>
+                      <ul className="space-y-1 text-sm">
+                        {classItem.schedule.map((slot, index) => (
+                          <li key={index} className="flex">
+                            <span className="font-medium w-24">{slot.day}:</span>
+                            <span className="text-gray-600">{slot.time}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                
+                    {/* Book Button (Pushed to Bottom) */}
+                    <button className="mt-auto w-full bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                      Book Class
+                    </button>
+                  </div>
+                </motion.div>
+                
                 ))}
               </motion.div>
               
