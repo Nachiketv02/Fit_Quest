@@ -77,6 +77,13 @@ userSchema.methods.generateVerificationCode = async function(){
     return code;
 }
 
+userSchema.methods.generateResetPasswordToken = async function(){
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    this.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+    this.resetPasswordTokenExpires = Date.now() + 5 * 60 * 1000;
+    return resetToken;
+}
+
 const userModel = mongoose.model("user", userSchema);
 
 module.exports = userModel;

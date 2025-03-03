@@ -3,6 +3,7 @@ const userService = require("../service/user.service");
 const { validationResult } = require("express-validator");
 const { sendEmail } = require("../utils/sendEmail");
 const {sendToken} = require("../utils/sendToken");
+const crypto = require("crypto");
 
 module.exports.signupUser = async (req, res) => {
   try {
@@ -333,9 +334,55 @@ module.exports.loginUser = async (req, res) => {
 
 module.exports.forgotPassword = async (req, res) => {
   try{
-    
+    const { email } = req.body;
+    if(!email){
+      return res.status(400).json({ error: "Email is required" });
+    }
+
+    const user = await userModel.findOne({ email });
+
+    if(!user){
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    const passwordResetToken = await user.generateResetPasswordToken();
+    await user.save({ validateModifiedOnly: false });
+
+    const resetUrl = `${process.env.FRONTEND_URL}/fit-quest/users/reset-password/${passwordResetToken}`;
+    console.log(resetUrl);
+
+    // const message = `Click on the following link to reset your password: ${resetUrl}`;
+
+    // await sendEmail({ email: user.email, subject: "Password Reset", message });
+
+    return res.status(200).json({ message: "Password reset token sent to your email" });
+
   } catch(error){
     console.log("Error in forgotPassword Controller:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+module.exports.resetPassword = async (req, res) => {
+  try{
+    const { token } = req.params;
+    const resetPasswordToken = crypto.createHash("sha256").update(token).digest("hex");
+    const user = await userModel.findOne({ resetPasswordToken, resetPasswordTokenExpires: { $gt: Date.now() } });
+    if(!user){
+      return res.status(400).json({ error: "Invalid or expired token" });
+    }
+
+    if (req.body.password !== req.body.confirmPassword) {
+      return res.status(400).json({ error: "Passwords do not match!" });
+    }
+
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordTokenExpires = undefined;
+    await user.save({ validateModifiedOnly: false });
+    sendToken(user, 200, "Password reset successful", res);
+  } catch(error){
+    console.log("Error in resetPassword Controller:", error.message);
     return res.status(500).json({ error: error.message });
   }
 }
