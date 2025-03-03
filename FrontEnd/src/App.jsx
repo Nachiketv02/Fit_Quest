@@ -11,6 +11,8 @@ import OtpVerification from './pages/OtpVerification';
 import Classes from './pages/Classes';
 import Trainers from './pages/Trainers';
 import Schedule from './pages/Schedule';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
           <Route path="/classes" element={<Classes />} />
           <Route path="/trainers" element={<Trainers />} />
           <Route path="/schedule" element={<Schedule />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
         </Routes>
         <Footer />
       </div>

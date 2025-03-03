@@ -346,14 +346,14 @@ module.exports.forgotPassword = async (req, res) => {
     }
 
     const passwordResetToken = await user.generateResetPasswordToken();
+    console.log(passwordResetToken);
     await user.save({ validateModifiedOnly: false });
 
-    const resetUrl = `${process.env.FRONTEND_URL}/fit-quest/users/reset-password/${passwordResetToken}`;
-    console.log(resetUrl);
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${passwordResetToken}`;
 
-    // const message = `Click on the following link to reset your password: ${resetUrl}`;
+    const message = `Click on the following link to reset your password: ${resetUrl}`;
 
-    // await sendEmail({ email: user.email, subject: "Password Reset", message });
+    await sendEmail({ email: user.email, subject: "Password Reset", message });
 
     return res.status(200).json({ message: "Password reset token sent to your email" });
 
