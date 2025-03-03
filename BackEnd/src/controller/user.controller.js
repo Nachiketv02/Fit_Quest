@@ -346,7 +346,6 @@ module.exports.forgotPassword = async (req, res) => {
     }
 
     const passwordResetToken = await user.generateResetPasswordToken();
-    console.log(passwordResetToken);
     await user.save({ validateModifiedOnly: false });
 
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${passwordResetToken}`;
@@ -371,16 +370,16 @@ module.exports.resetPassword = async (req, res) => {
     if(!user){
       return res.status(400).json({ error: "Invalid or expired token" });
     }
-
     if (req.body.password !== req.body.confirmPassword) {
       return res.status(400).json({ error: "Passwords do not match!" });
     }
-
-    user.password = req.body.password;
+    const resetPassword = await userModel.hashPassword(req.body.password);
+    user.password = resetPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordTokenExpires = undefined;
-    await user.save({ validateModifiedOnly: false });
-    sendToken(user, 200, "Password reset successful", res);
+    await user.save();
+    return sendToken(user, 200, "Password reset successful", res);
+  
   } catch(error){
     console.log("Error in resetPassword Controller:", error.message);
     return res.status(500).json({ error: error.message });

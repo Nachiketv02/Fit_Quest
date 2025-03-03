@@ -12,7 +12,8 @@ function Login() {
   });
 
   const navigate = useNavigate();
-  const { setUserData } = useContext(UserDataContext);
+  const { setUserData , setIsAuthenticated } = useContext(UserDataContext);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,9 +25,11 @@ function Login() {
       };
 
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/fit-quest/users/login`, user , { headers: { "Content-Type": "application/json" } },{withCredentials:true});
+      console.log(response);
       if (response.status === 200) {
         const data = response.data;
         setUserData(data);
+        setIsAuthenticated(true);
         toast.success(response.data.message, { position: 'top-right' });
         localStorage.setItem('token', data.token);
         setTimeout(() => {
@@ -93,10 +96,10 @@ function Login() {
             </div>
           </div>
 
-          {/* Forgot Password Link */}
+          
           <div className="text-right">
             <Link
-              to="/forgot-password" // Replace with your forgot password route
+              to="/forgot-password"
               className="text-sm text-primary hover:text-primary/90"
             >
               Forgot Password?
