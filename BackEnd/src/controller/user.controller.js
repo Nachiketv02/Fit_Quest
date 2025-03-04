@@ -1,4 +1,5 @@
 const userModel = require("../model/user.model");
+const blackListTokenModel = require("../model/blackListToken.model");
 const userService = require("../service/user.service");
 const { validationResult } = require("express-validator");
 const { sendEmail } = require("../utils/sendEmail");
@@ -382,6 +383,34 @@ module.exports.resetPassword = async (req, res) => {
   
   } catch(error){
     console.log("Error in resetPassword Controller:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+module.exports.getUserProfile = async (req, res) => {
+  try{
+    return res.status(200).json({ user: req.user });
+  } catch(error){
+    console.log("Error in getUserProfile Controller:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+}
+
+module.exports.logoutUser = async (req, res) => {
+  try{
+    const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
+    if(!token){
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    const blackListToken = await blackListTokenModel.findOne({ token });
+    if(blackListToken){
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+    await blackListTokenModel.create({ token });
+    res.clearCookie("token");
+    return res.status(200).json({ message: "Logged out successfully" });
+  } catch(error){
+    console.log("Error in logoutUser Controller:", error.message);
     return res.status(500).json({ error: error.message });
   }
 }

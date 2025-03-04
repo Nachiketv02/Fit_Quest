@@ -1,61 +1,41 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FiMenu, FiX, FiChevronRight } from 'react-icons/fi';
+import { useState, useEffect, useContext } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiMenu, FiX, FiChevronRight } from "react-icons/fi";
+import { UserDataContext } from "../context/UserContext"; // Import UserContext
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated, setIsAuthenticated } = useContext(UserDataContext); // Get auth state
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Classes', path: '/classes' },
-    { name: 'Trainers', path: '/trainers' },
-    { name: 'Schedule', path: '/schedule' },
+    { name: "Home", path: "/" },
+    { name: "Classes", path: "/classes" },
+    { name: "Trainers", path: "/trainers" },
+    { name: "Schedule", path: "/schedule" },
   ];
 
-  const menuVariants = {
-    closed: {
-      x: '100%',
-      transition: {
-        type: 'tween',
-        duration: 0.3,
-      },
-    },
-    open: {
-      x: 0,
-      transition: {
-        type: 'tween',
-        duration: 0.3,
-      },
-    },
-  };
-
-  const linkVariants = {
-    closed: { x: 50, opacity: 0 },
-    open: i => ({
-      x: 0,
-      opacity: 1,
-      transition: {
-        delay: i * 0.1,
-      },
-    }),
+  const handleLogout = () => {
+    setIsAuthenticated(false); 
+    navigate("/login");
   };
 
   return (
     <>
-      <motion.nav 
-        className={`navbar-container ${scrolled ? 'navbar-scrolled' : ''}`}
+      <motion.nav
+        className={`navbar-container ${scrolled ? "navbar-scrolled" : ""}`}
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
@@ -71,77 +51,51 @@ function Navbar() {
               <Link to="/" className="navbar-brand">
                 <span className="text-gradient">Fit</span>
                 <span className="text-gradient-alt">Quest</span>
-                <motion.div 
-                  className="brand-line"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: 0.5 }}
-                />
               </Link>
             </motion.div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-2">
-              {navLinks.map((link, index) => (
-                <motion.div
+              {navLinks.map((link) => (
+                <Link
                   key={link.path}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="nav-item-wrapper"
+                  to={link.path}
+                  className={`nav-link ${
+                    location.pathname === link.path ? "active" : ""
+                  }`}
                 >
-                  <Link
-                    to={link.path}
-                    className={`nav-link ${location.pathname === link.path ? 'active' : ''}`}
-                  >
-                    <span>{link.name}</span>
-                    <motion.div 
-                      className="nav-indicator"
-                      initial={false}
-                      animate={{ 
-                        scale: location.pathname === link.path ? 1 : 0,
-                        opacity: location.pathname === link.path ? 1 : 0
-                      }}
-                    />
-                  </Link>
-                </motion.div>
+                  {link.name}
+                </Link>
               ))}
             </div>
 
             {/* Auth Buttons */}
             <div className="hidden md:flex items-center space-x-4">
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <Link to="/login" className="auth-button login">
-                  Login
-                  <FiChevronRight className="ml-2" />
-                </Link>
-              </motion.div>
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 }}
-                whileHover={{ scale: 1.05 }}
-              >
-                <Link to="/signup" className="auth-button signup">
-                  Sign Up
-                  <motion.div
-                    className="button-shine"
-                    animate={{
-                      x: ["0%", "100%"],
-                    }}
-                    transition={{
-                      duration: 1,
-                      repeat: Infinity,
-                      repeatDelay: 2
-                    }}
-                  />
-                </Link>
-              </motion.div>
+              {isAuthenticated ? (
+                // If user is logged in, show Logout button
+                <motion.button
+                  onClick={handleLogout}
+                  className="auth-button logout"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  Logout
+                </motion.button>
+              ) : (
+                // If user is not logged in, show Login & Signup buttons
+                <>
+                  <motion.div whileHover={{ scale: 1.05 }}>
+                    <Link to="/login" className="auth-button login">
+                      Login
+                      <FiChevronRight className="ml-2" />
+                    </Link>
+                  </motion.div>
+                  <motion.div whileHover={{ scale: 1.05 }}>
+                    <Link to="/signup" className="auth-button signup">
+                      Sign Up
+                    </Link>
+                  </motion.div>
+                </>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -162,53 +116,53 @@ function Navbar() {
         {isOpen && (
           <motion.div
             className="mobile-menu md:hidden"
-            initial="closed"
-            animate="open"
-            exit="closed"
-            variants={menuVariants}
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "tween", duration: 0.3 }}
           >
             <div className="mobile-menu-content">
-              {navLinks.map((link, i) => (
-                <motion.div
+              {navLinks.map((link) => (
+                <Link
                   key={link.path}
-                  custom={i}
-                  variants={linkVariants}
-                  className="mobile-link-wrapper"
+                  to={link.path}
+                  className="mobile-link"
+                  onClick={() => setIsOpen(false)}
                 >
-                  <Link
-                    to={link.path}
-                    className="mobile-link"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {link.name}
-                    <motion.div 
-                      className="mobile-link-indicator"
-                      initial={{ width: 0 }}
-                      whileHover={{ width: "100%" }}
-                    />
-                  </Link>
-                </motion.div>
+                  {link.name}
+                </Link>
               ))}
-              <motion.div
-                custom={4}
-                variants={linkVariants}
-                className="mobile-auth-buttons"
-              >
-                <Link
-                  to="/login"
-                  className="auth-button login"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/signup"
-                  className="auth-button signup"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Sign Up
-                </Link>
-              </motion.div>
+              <div className="mobile-auth-buttons">
+                {isAuthenticated ? (
+                  <button
+                    className="auth-button logout"
+                    onClick={() => {
+                      handleLogout();
+                      setIsOpen(false);
+                    }}
+                  >
+                    Logout
+                  </button>
+                  
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      className="auth-button login"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      to="/signup"
+                      className="auth-button signup"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </motion.div>
         )}

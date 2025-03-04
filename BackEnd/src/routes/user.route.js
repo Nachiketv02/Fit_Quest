@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const {body} = require("express-validator");
 const userController = require("../controller/user.controller");
+const authMiddleware = require("../middleware/auth.middleware");
 
 router.post("/signup", [
     body("fullName").isLength({ min: 3 }),
@@ -23,5 +24,9 @@ router.post('/login',[
 router.post('/forgot-password',userController.forgotPassword);
 
 router.put('/reset-password/:token',userController.resetPassword);
+
+router.get("/profile",authMiddleware.isAuthenticated,userController.getUserProfile);
+
+router.get('/logout',authMiddleware.isAuthenticated,userController.logoutUser);
 
 module.exports = router;
