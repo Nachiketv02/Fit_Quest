@@ -37,7 +37,11 @@ function Login() {
         toast.success(response.data.message, { position: "top-right" });
         localStorage.setItem("token", data.token);
         setTimeout(() => {
-          navigate("/learnmore");
+          if(data.user.role === "admin"){
+            navigate("/admin/dashboard");
+          }else{
+            navigate("/classes");
+          }
         }, 2000);
       } else {
         toast.error(response.data.message, { position: "top-right" });

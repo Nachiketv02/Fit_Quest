@@ -3,7 +3,7 @@ const blackListTokenModel = require("../model/blackListToken.model");
 const userService = require("../service/user.service");
 const { validationResult } = require("express-validator");
 const { sendEmail } = require("../utils/sendEmail");
-const {sendToken} = require("../utils/sendToken");
+const { sendToken } = require("../utils/sendToken");
 const crypto = require("crypto");
 
 module.exports.signupUser = async (req, res) => {
@@ -39,7 +39,6 @@ module.exports.signupUser = async (req, res) => {
     await userModel.findByIdAndUpdate(user._id, { verificationCode });
 
     sendVerificationEmail(verificationCode, user, res);
-
   } catch (error) {
     if (error.response) {
       console.log("Error Data:", error.response.data);
@@ -50,8 +49,8 @@ module.exports.signupUser = async (req, res) => {
   }
 };
 
-function generateEmailVerificationLink(verificationCode , fullName) {
-    return `<!DOCTYPE html>
+function generateEmailVerificationLink(verificationCode, fullName) {
+  return `<!DOCTYPE html>
     <html>
     <head>
       <meta charset="utf-8">
@@ -226,12 +225,15 @@ function generateEmailVerificationLink(verificationCode , fullName) {
 
 async function sendVerificationEmail(verificationCode, user, res) {
   try {
-    const message = generateEmailVerificationLink(verificationCode, user.fullName);
+    const message = generateEmailVerificationLink(
+      verificationCode,
+      user.fullName
+    );
     sendEmail({ email: user.email, subject: "Verification Code", message });
     res.status(200).json({
-        message: `Verification mail sent to ${user.fullName}`,
-        user : user.email
-      });
+      message: `Verification mail sent to ${user.fullName}`,
+      user: user.email,
+    });
   } catch (error) {
     console.log("Error sending verification email:", error.message);
   }
@@ -239,42 +241,43 @@ async function sendVerificationEmail(verificationCode, user, res) {
 
 module.exports.verifyUser = async (req, res) => {
   try {
-      const { email, verificationCode } = req.body;
+    const { email, verificationCode } = req.body;
 
-      if (!email || !verificationCode) {
-          return res.status(400).json({ error: "All fields are required" });
-      }
+    if (!email || !verificationCode) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
 
-      const user = await userModel.findOne({ email: email, isVerified: false }).sort({ createdAt: -1 });
+    const user = await userModel
+      .findOne({ email: email, isVerified: false })
+      .sort({ createdAt: -1 });
 
-      if (!user) {
-          return res.status(400).json({ error: "User not found" });
-      }
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
 
-      if (user.verificationCode !== verificationCode) {
-          return res.status(400).json({ error: "Invalid verification code" });
-      }
+    if (user.verificationCode !== verificationCode) {
+      return res.status(400).json({ error: "Invalid verification code" });
+    }
 
-      if (user.verificationCodeExpires < Date.now()) {
-          return res.status(400).json({ error: "Verification code expired" });
-      }
+    if (user.verificationCodeExpires < Date.now()) {
+      return res.status(400).json({ error: "Verification code expired" });
+    }
 
-      // Update user verification status
-      user.isVerified = true;
-      user.verificationCode = undefined;
-      user.verificationCodeExpires = undefined;
-      await user.save();
+    user.isVerified = true;
+    user.verificationCode = undefined;
+    user.verificationCodeExpires = undefined;
+    await user.save();
 
-      // Send success response
-      return sendToken(user, 200, "User verified successfully", res);
+    return sendToken(user, 200, "User verified successfully", res);
+
   } catch (error) {
-      console.log("Error in verifyUser Controller:", error.message);
-      return res.status(500).json({ error: error.message });
+    console.log("Error in verifyUser Controller:", error.message);
+    return res.status(500).json({ error: error.message });
   }
 };
 
 module.exports.resendVerificationCode = async (req, res) => {
-  try{
+  try {
     const { email } = req.body;
     if (!email) {
       return res.status(400).json({ error: "Email is required" });
@@ -288,21 +291,23 @@ module.exports.resendVerificationCode = async (req, res) => {
     const expirationTime = Date.now() + 10 * 60 * 1000; // 10 min from now
     user.verificationCodeExpires = expirationTime;
     await user.save();
-    const message = generateEmailVerificationLink(newVerificationCode, user.fullName);
+    const message = generateEmailVerificationLink(
+      newVerificationCode,
+      user.fullName
+    );
     sendEmail({ email: user.email, subject: "Verification Code", message });
     res.status(200).json({
-        message: `Verification mail sent to ${user.fullName}`,
-        user : user.email
-      });
-  }
-  catch(error){
+      message: `Verification mail sent to ${user.fullName}`,
+      user: user.email,
+    });
+  } catch (error) {
     console.log("Error in resendVerificationCode Controller:", error.message);
     return res.status(500).json({ error: error.message });
   }
-}
+};
 
 module.exports.loginUser = async (req, res) => {
-  try{  
+  try {
     const error = validationResult(req);
     if (!error.isEmpty()) {
       return res.status(400).json({ errors: error.array() });
@@ -310,39 +315,39 @@ module.exports.loginUser = async (req, res) => {
 
     const { email, password } = req.body;
 
-    if(!email || !password){
+    if (!email || !password) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const user = await userModel.findOne({ email , isVerified : true });
-    if(!user){
+    const user = await userModel.findOne({ email, isVerified: true });
+    if (!user) {
       return res.status(400).json({ error: "User not found" });
     }
 
     const isPasswordValid = await user.comparePassword(password);
 
-    if(!isPasswordValid){
+    if (!isPasswordValid) {
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
     return sendToken(user, 200, "Login successful", res);
 
-  } catch(error){
+  } catch (error) {
     console.log("Error in loginUser Controller:", error.message);
     return res.status(500).json({ error: error.message });
   }
-}
+};
 
 module.exports.forgotPassword = async (req, res) => {
-  try{
+  try {
     const { email } = req.body;
-    if(!email){
+    if (!email) {
       return res.status(400).json({ error: "Email is required" });
     }
 
     const user = await userModel.findOne({ email });
 
-    if(!user){
+    if (!user) {
       return res.status(400).json({ error: "User not found" });
     }
 
@@ -355,20 +360,27 @@ module.exports.forgotPassword = async (req, res) => {
 
     await sendEmail({ email: user.email, subject: "Password Reset", message });
 
-    return res.status(200).json({ message: "Password reset token sent to your email" });
-
-  } catch(error){
+    return res
+      .status(200)
+      .json({ message: "Password reset token sent to your email" });
+  } catch (error) {
     console.log("Error in forgotPassword Controller:", error.message);
     return res.status(500).json({ error: error.message });
   }
-}
+};
 
 module.exports.resetPassword = async (req, res) => {
-  try{
+  try {
     const { token } = req.params;
-    const resetPasswordToken = crypto.createHash("sha256").update(token).digest("hex");
-    const user = await userModel.findOne({ resetPasswordToken, resetPasswordTokenExpires: { $gt: Date.now() } });
-    if(!user){
+    const resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+    const user = await userModel.findOne({
+      resetPasswordToken,
+      resetPasswordTokenExpires: { $gt: Date.now() },
+    });
+    if (!user) {
       return res.status(400).json({ error: "Invalid or expired token" });
     }
     if (req.body.password !== req.body.confirmPassword) {
@@ -380,37 +392,38 @@ module.exports.resetPassword = async (req, res) => {
     user.resetPasswordTokenExpires = undefined;
     await user.save();
     return sendToken(user, 200, "Password reset successful", res);
-  
-  } catch(error){
+  } catch (error) {
     console.log("Error in resetPassword Controller:", error.message);
     return res.status(500).json({ error: error.message });
   }
-}
+};
 
 module.exports.getUserProfile = async (req, res) => {
-  try{
+  try {
     return res.status(200).json({ user: req.user });
-  } catch(error){
+  } catch (error) {
     console.log("Error in getUserProfile Controller:", error.message);
     return res.status(500).json({ error: error.message });
   }
-}
+};
 
 module.exports.logoutUser = async (req, res) => {
-  try{
+  try {
     const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-    if(!token){
+    if (!token) {
       return res.status(401).json({ error: "Unauthorized" });
     }
     const blackListToken = await blackListTokenModel.findOne({ token });
-    if(blackListToken){
-      return res.status(401).json({ error: "blackListToken find you are Unauthorized" });
+    if (blackListToken) {
+      return res
+        .status(401)
+        .json({ error: "blackListToken find you are Unauthorized" });
     }
     await blackListTokenModel.create({ token });
     res.clearCookie("token");
     return res.status(200).json({ message: "Logged out successfully" });
-  } catch(error){
+  } catch (error) {
     console.log("Error in logoutUser Controller:", error.message);
     return res.status(500).json({ error: error.message });
   }
-}
+};
