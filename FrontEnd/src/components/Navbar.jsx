@@ -2,14 +2,15 @@ import { useState, useEffect, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiMenu, FiX, FiChevronRight } from "react-icons/fi";
-import { UserDataContext } from "../context/UserContext"; // Import UserContext
+import { UserDataContext } from "../context/UserContext"; 
+import axios from "axios";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, setIsAuthenticated } = useContext(UserDataContext); // Get auth state
+  const { isAuthenticated, setIsAuthenticated } = useContext(UserDataContext);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,12 +25,20 @@ function Navbar() {
     { name: "Home", path: "/" },
     { name: "Classes", path: "/classes" },
     { name: "Trainers", path: "/trainers" },
-    { name: "Schedule", path: "/schedule" },
-  ];
+    { name: "Membership", path: "/subscription" },
+  ]; 
 
-  const handleLogout = () => {
-    setIsAuthenticated(false); 
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/fit-quest/users/logout`, { withCredentials: true });
+      if (response.status === 200) {
+        setIsAuthenticated(false);
+        localStorage.removeItem('token');
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
@@ -72,16 +81,15 @@ function Navbar() {
             {/* Auth Buttons */}
             <div className="hidden md:flex items-center space-x-4">
               {isAuthenticated ? (
-                // If user is logged in, show Logout button
                 <motion.button
                   onClick={handleLogout}
-                  className="auth-button logout"
+                  className="auth-button login" // ✅ Now matches Login button
                   whileHover={{ scale: 1.05 }}
                 >
                   Logout
+                  <FiChevronRight className="ml-2" />
                 </motion.button>
               ) : (
-                // If user is not logged in, show Login & Signup buttons
                 <>
                   <motion.div whileHover={{ scale: 1.05 }}>
                     <Link to="/login" className="auth-button login">
@@ -135,15 +143,15 @@ function Navbar() {
               <div className="mobile-auth-buttons">
                 {isAuthenticated ? (
                   <button
-                    className="auth-button logout"
+                    className="auth-button login" // ✅ Styled same as login button
                     onClick={() => {
                       handleLogout();
                       setIsOpen(false);
                     }}
                   >
                     Logout
+                    <FiChevronRight className="ml-2" />
                   </button>
-                  
                 ) : (
                   <>
                     <Link
@@ -152,6 +160,7 @@ function Navbar() {
                       onClick={() => setIsOpen(false)}
                     >
                       Login
+                      <FiChevronRight className="ml-2" />
                     </Link>
                     <Link
                       to="/signup"

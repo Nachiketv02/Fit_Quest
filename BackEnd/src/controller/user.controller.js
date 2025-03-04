@@ -404,7 +404,7 @@ module.exports.logoutUser = async (req, res) => {
     }
     const blackListToken = await blackListTokenModel.findOne({ token });
     if(blackListToken){
-      return res.status(401).json({ error: "Unauthorized" });
+      return res.status(401).json({ error: "blackListToken find you are Unauthorized" });
     }
     await blackListTokenModel.create({ token });
     res.clearCookie("token");

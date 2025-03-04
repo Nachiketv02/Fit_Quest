@@ -14,6 +14,7 @@ import Schedule from "./pages/Schedule";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Subscription from "./pages/Subscription";
 
 function App() {
   return (
@@ -42,11 +43,19 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
+          {/* <Route
             path="/schedule"
             element={
               <ProtectedRoute>
                 <Schedule />
+              </ProtectedRoute>
+            }
+          /> */}
+          <Route
+            path="/subscription"
+            element={
+              <ProtectedRoute>
+                <Subscription />
               </ProtectedRoute>
             }
           />
