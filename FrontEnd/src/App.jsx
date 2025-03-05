@@ -15,11 +15,13 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Subscription from "./pages/Subscription";
+import Profile from "./pages/Profile";
 
 //admin side
 import Dashboard from "./pages/Admin/Dashboard";
 import Members from "./pages/Admin/Members";
 import AdminClasses from "./pages/Admin/AdminClasses";
+import InstructorsPage from "./pages/Admin/InstructorsPage";
 
 function App() {
   return (
@@ -64,6 +66,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
 
@@ -71,6 +81,7 @@ function App() {
           <Route path="/admin/dashboard" element={<Dashboard />} />
           <Route path="/admin/members" element={<Members />} />
           <Route path="/admin/classes" element={<AdminClasses />} />
+          <Route path="/admin/instructors" element={<InstructorsPage />} />
 
         </Routes>
         <Footer />

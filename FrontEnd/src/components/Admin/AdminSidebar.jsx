@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiHome, FiUsers, FiCalendar, FiDollarSign, FiSettings, FiLogOut, FiX, FiBarChart2 } from 'react-icons/fi';
+import { FiHome, FiUsers, FiCalendar, FiDollarSign, FiSettings, FiLogOut, FiX, FiBarChart2, FiUserCheck } from 'react-icons/fi';
 
 function AdminSidebar({ isMobile, isOpen, onClose }) {
   const location = useLocation();
@@ -11,6 +11,7 @@ function AdminSidebar({ isMobile, isOpen, onClose }) {
     { name: 'Classes', icon: FiCalendar, path: '/admin/classes' },
     { name: 'Subscriptions', icon: FiDollarSign, path: '/admin/subscriptions' },
     { name: 'Reports', icon: FiBarChart2, path: '/admin/reports' },
+    { name: 'Instructors', icon: FiUserCheck, path: '/admin/instructors' },
     { name: 'Settings', icon: FiSettings, path: '/admin/settings' },
   ];
   

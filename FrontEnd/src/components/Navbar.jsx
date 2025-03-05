@@ -1,16 +1,17 @@
 import { useState, useEffect, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiMenu, FiX, FiChevronRight } from "react-icons/fi";
+import { FiMenu, FiX, FiUser, FiLogOut } from "react-icons/fi";
 import { UserDataContext } from "../context/UserContext"; 
 import axios from "axios";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, setIsAuthenticated } = useContext(UserDataContext);
+  const { isAuthenticated, setIsAuthenticated, userData } = useContext(UserDataContext);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,6 +35,7 @@ function Navbar() {
       if (response.status === 200) {
         setIsAuthenticated(false);
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         navigate('/');
       }
     } catch (error) {
@@ -79,22 +81,58 @@ function Navbar() {
             </div>
 
             {/* Auth Buttons */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-4 relative">
               {isAuthenticated ? (
-                <motion.button
-                  onClick={handleLogout}
-                  className="auth-button login" // ✅ Now matches Login button
-                  whileHover={{ scale: 1.05 }}
-                >
-                  Logout
-                  <FiChevronRight className="ml-2" />
-                </motion.button>
+                <div className="relative">
+                  {/* Username Button */}
+                  <motion.button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="auth-button login relative"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    Hi, {userData?.fullName || "User"}
+                  </motion.button>
+
+                  {/* Dropdown Menu */}
+                  <AnimatePresence>
+                    {dropdownOpen && (
+                      <motion.div
+                        className="absolute right-0 mt-2 w-44 bg-white rounded-lg shadow-md border border-gray-200"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        style={{
+                          borderRadius: "12px",
+                          overflow: "hidden",
+                        }}
+                      >
+                        <Link
+                          to="/profile"
+                          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          <FiUser className="mr-2" />
+                          Profile
+                        </Link>
+                        <button
+                          onClick={() => {
+                            handleLogout();
+                            setDropdownOpen(false);
+                          }}
+                          className="flex items-center w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        >
+                          <FiLogOut className="mr-2" />
+                          Logout
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               ) : (
                 <>
                   <motion.div whileHover={{ scale: 1.05 }}>
                     <Link to="/login" className="auth-button login">
                       Login
-                      <FiChevronRight className="ml-2" />
                     </Link>
                   </motion.div>
                   <motion.div whileHover={{ scale: 1.05 }}>
@@ -142,16 +180,26 @@ function Navbar() {
               ))}
               <div className="mobile-auth-buttons">
                 {isAuthenticated ? (
-                  <button
-                    className="auth-button login" // ✅ Styled same as login button
-                    onClick={() => {
-                      handleLogout();
-                      setIsOpen(false);
-                    }}
-                  >
-                    Logout
-                    <FiChevronRight className="ml-2" />
-                  </button>
+                  <>
+                    <Link
+                      to="/profile"
+                      className="flex items-center auth-button login"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <FiUser className="mr-2" />
+                      Profile
+                    </Link>
+                    <button
+                      className="flex items-center auth-button login"
+                      onClick={() => {
+                        handleLogout();
+                        setIsOpen(false);
+                      }}
+                    >
+                      <FiLogOut className="mr-2" />
+                      Logout
+                    </button>
+                  </>
                 ) : (
                   <>
                     <Link
@@ -160,7 +208,6 @@ function Navbar() {
                       onClick={() => setIsOpen(false)}
                     >
                       Login
-                      <FiChevronRight className="ml-2" />
                     </Link>
                     <Link
                       to="/signup"

@@ -32,15 +32,16 @@ function Login() {
       );
       if (response.status === 200) {
         const data = response.data;
-        setUserData(data);
+        setUserData(data.user);
         setIsAuthenticated(true);
         toast.success(response.data.message, { position: "top-right" });
+        localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("token", data.token);
         setTimeout(() => {
           if(data.user.role === "admin"){
             navigate("/admin/dashboard");
           }else{
-            navigate("/classes");
+            navigate("/subscription");
           }
         }, 2000);
       } else {
