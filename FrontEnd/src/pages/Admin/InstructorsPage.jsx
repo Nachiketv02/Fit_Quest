@@ -52,7 +52,7 @@ function InstructorsPage() {
       if (searchQuery) {
         const searchResult = await searchInstructors(searchQuery, currentPage, instructorsPerPage);
         data = searchResult.instructors;
-        setTotalPages(searchResult.pagination.totalPages);
+        setTotalPages(Math.ceil(searchResult.total / instructorsPerPage));
       } else {
         const result = await getInstructors(currentPage, instructorsPerPage);
         data = result.instructors;
