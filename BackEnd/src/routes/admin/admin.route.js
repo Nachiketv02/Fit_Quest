@@ -24,4 +24,6 @@ router.put("/instructors/:id", authMiddleware.isAuthenticated, authMiddleware.is
 
 router.delete("/instructors/:id", authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminInstructorsController.deleteInstructor);
 
+router.get('/instructors/search', authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminInstructorsController.searchInstructors);
+
 module.exports = router;

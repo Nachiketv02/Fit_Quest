@@ -7,11 +7,11 @@ function AdminSidebar({ isMobile, isOpen, onClose }) {
   
   const menuItems = [
     { name: 'Dashboard', icon: FiHome, path: '/admin/dashboard' },
+    { name: 'Instructors', icon: FiUserCheck, path: '/admin/instructors' },
     { name: 'Members', icon: FiUsers, path: '/admin/members' },
     { name: 'Classes', icon: FiCalendar, path: '/admin/classes' },
     { name: 'Subscriptions', icon: FiDollarSign, path: '/admin/subscriptions' },
     { name: 'Reports', icon: FiBarChart2, path: '/admin/reports' },
-    { name: 'Instructors', icon: FiUserCheck, path: '/admin/instructors' },
     { name: 'Settings', icon: FiSettings, path: '/admin/settings' },
   ];
   
@@ -21,7 +21,7 @@ function AdminSidebar({ isMobile, isOpen, onClose }) {
   
   const sidebarContent = (
     <>
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 mt-5">
         <Link to="/admin/dashboard" className="flex items-center">
           <span className="text-gradient font-bold text-xl">Fit</span>
           <span className="text-gradient-alt font-bold text-xl">Quest</span>

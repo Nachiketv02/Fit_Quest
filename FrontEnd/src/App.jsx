@@ -82,7 +82,6 @@ function App() {
           <Route path="/admin/members" element={<Members />} />
           <Route path="/admin/classes" element={<AdminClasses />} />
           <Route path="/admin/instructors" element={<InstructorsPage />} />
-
         </Routes>
         <Footer />
       </div>

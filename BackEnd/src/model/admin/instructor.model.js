@@ -37,6 +37,8 @@ const instructorSchema = new mongoose.Schema({
     }
 });
 
+instructorSchema.index({ fullName: 1, email: 1, specialties: 1 });
+
 const instructorModel = mongoose.model("instructor", instructorSchema);
 
 module.exports = instructorModel;

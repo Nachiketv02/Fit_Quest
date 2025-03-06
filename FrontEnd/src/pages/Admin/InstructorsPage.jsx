@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiPlus,
@@ -9,6 +9,8 @@ import {
   FiPhone,
   FiActivity,
   FiAlertTriangle,
+  FiChevronLeft,
+  FiChevronRight,
 } from "react-icons/fi";
 import AdminSidebar from "../../components/Admin/AdminSidebar";
 import AdminHeader from "../../components/Admin/AdminHeader";
@@ -17,7 +19,9 @@ import {
   addInstructor,
   updateInstructor,
   deleteInstructor,
+  searchInstructors
 } from "../../services/Admin/api";
+import debounce from 'lodash/debounce';
 
 function InstructorsPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -29,17 +33,37 @@ function InstructorsPage() {
     isOpen: false,
     instructor: null,
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const instructorsPerPage = 5;
 
   useEffect(() => {
     fetchInstructors();
-  }, []);
+  }, [searchQuery, currentPage]);
 
   const fetchInstructors = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const data = await getInstructors();
+      let data;
+      if (searchQuery) {
+        const searchResult = await searchInstructors(searchQuery, currentPage, instructorsPerPage);
+        data = searchResult.instructors;
+        setTotalPages(searchResult.pagination.totalPages);
+      } else {
+        const result = await getInstructors(currentPage, instructorsPerPage);
+        data = result.instructors;
+        setTotalPages(result.pagination.totalPages);
+      }
       setInstructors(data);
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      setError(err.message || 'Failed to fetch instructors.');
+      console.error("Fetch instructors error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -251,7 +275,7 @@ function InstructorsPage() {
     };
   
     if (!isOpen) return null;
-  
+
     return (
       <>
         <div
@@ -269,7 +293,6 @@ function InstructorsPage() {
           </h2>
   
           <form className="space-y-4" onSubmit={handleEditInstructor}>
-            {/* Form Fields Similar to Add Modal */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Full Name
@@ -366,29 +389,41 @@ function InstructorsPage() {
     );
   };
 
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      setSearchQuery(value);
+      setCurrentPage(1); 
+    }, 750),
+    []
+  );
+
+  const handleSearchChange = (e) => {
+    debouncedSearch(e.target.value);
+  };
+
+  const goToPreviousPage = () => {
+    setCurrentPage(prev => Math.max(prev - 1, 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar for desktop */}
       <AdminSidebar isMobile={false} isOpen={true} />
-
-      {/* Mobile Sidebar */}
       <AdminSidebar
         isMobile={true}
         isOpen={isMobileSidebarOpen}
         onClose={() => setIsMobileSidebarOpen(false)}
       />
-
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <AdminHeader
           title="Instructors"
           onMenuClick={() => setIsMobileSidebarOpen(true)}
         />
-
-        {/* Main content */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
           <div className="max-w-7xl mx-auto">
-            {/* Page Header */}
             <div className="bg-white rounded-xl shadow-md p-6 mb-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between">
                 <div className="mb-4 md:mb-0">
@@ -409,7 +444,6 @@ function InstructorsPage() {
               </div>
             </div>
 
-            {/* Filters and Search */}
             <div className="bg-white rounded-xl shadow-md p-6 mb-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div className="relative flex-1">
@@ -421,7 +455,7 @@ function InstructorsPage() {
                     placeholder="Search instructors..."
                     className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={handleSearchChange}
                   />
                 </div>
               </div>
@@ -531,16 +565,98 @@ function InstructorsPage() {
                   </tbody>
                 </table>
               </div>
+              
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+                  <div className="flex-1 flex justify-between sm:hidden">
+                    <button
+                      onClick={goToPreviousPage}
+                      disabled={currentPage === 1}
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                        currentPage === 1 
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      Previous
+                    </button>
+                    <button
+                      onClick={goToNextPage}
+                      disabled={currentPage === totalPages}
+                      className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                        currentPage === totalPages 
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      Next
+                    </button>
+                  </div>
+                  <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm text-gray-700">
+                        Showing <span className="font-medium">{(currentPage - 1) * instructorsPerPage + 1}</span> to{' '}
+                        <span className="font-medium">
+                          {Math.min(currentPage * instructorsPerPage, instructors.length)}
+                        </span>{' '}
+                        of <span className="font-medium">{instructors.length}</span> results
+                      </p>
+                    </div>
+                    <div>
+                      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                        <button
+                          onClick={goToPreviousPage}
+                          disabled={currentPage === 1}
+                          className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
+                            currentPage === 1 
+                              ? 'text-gray-300 cursor-not-allowed' 
+                              : 'text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          <span className="sr-only">Previous</span>
+                          <FiChevronLeft className="h-5 w-5" />
+                        </button>
+                        
+                        {[...Array(totalPages)].map((_, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setCurrentPage(i + 1)}
+                            className={`relative inline-flex items-center px-4 py-2 border ${
+                              currentPage === i + 1
+                                ? 'z-10 bg-primary border-primary text-white'
+                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                            } text-sm font-medium`}
+                          >
+                            {i + 1}
+                          </button>
+                        ))}
+                        
+                        <button
+                          onClick={goToNextPage}
+                          disabled={currentPage === totalPages}
+                          className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
+                            currentPage === totalPages 
+                              ? 'text-gray-300 cursor-not-allowed' 
+                              : 'text-gray-500 hover:bg-gray-50'
+                          }`}
+                        >
+                          <span className="sr-only">Next</span>
+                          <FiChevronRight className="h-5 w-5" />
+                        </button>
+                      </nav>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </main>
       </div>
 
-      {/* Delete Confirmation Modal */}
       <AnimatePresence>
         {deleteModal.isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -549,33 +665,24 @@ function InstructorsPage() {
               onClick={() => setDeleteModal({ isOpen: false, id: null })}
             />
 
-            {/* Modal Container */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className="fixed inset-0 flex items-center justify-center z-50"
             >
-              {/* Modal Content */}
               <div className="bg-white rounded-xl shadow-xl overflow-hidden w-full max-w-md">
                 <div className="p-6">
-                  {/* Icon */}
                   <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mx-auto mb-4">
                     <FiAlertTriangle className="w-6 h-6 text-red-600" />
                   </div>
-
-                  {/* Title */}
                   <h3 className="text-xl font-semibold text-gray-900 text-center mb-2">
                     Delete Instructor
                   </h3>
-
-                  {/* Message */}
                   <p className="text-gray-500 text-center mb-6">
                     Are you sure you want to delete this instructor? This action
                     cannot be undone.
                   </p>
-
-                  {/* Buttons */}
                   <div className="flex gap-3">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
@@ -603,7 +710,6 @@ function InstructorsPage() {
         )}
       </AnimatePresence>
 
-      {/* Add Instructor Modal */}
       <InstructorModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
