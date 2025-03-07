@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiSearch, FiFilter, FiEdit, FiTrash2, FiPlus, FiX, FiMapPin , FiCheck, FiChevronLeft, FiChevronRight, FiCalendar, FiClock, FiUser } from 'react-icons/fi';
+import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from 'react-datepicker';
 import AdminSidebar from '../../components/Admin/AdminSidebar';
 import AdminHeader from '../../components/Admin/AdminHeader';
 
@@ -16,6 +18,8 @@ function AdminClasses() {
     name: '',
     category: 'cardio',
     instructor: '',
+    day: '',
+    startDate: null,
     time: '',
     duration: '',
     capacity: '',
@@ -172,6 +176,8 @@ function AdminClasses() {
       name: '',
       category: 'cardio',
       instructor: '',
+      day: '',
+      startDate: null,
       time: '',
       duration: '',
       capacity: '',
@@ -561,6 +567,39 @@ function AdminClasses() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   placeholder="Enter instructor name"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="instructor" className="block text-sm font-medium text-gray-700 mb-1">
+                  Day
+                </label>
+                <input
+                  type="text"
+                  id="day"
+                  value={newClass.day}
+                  onChange={(e) => setNewClass({...newClass, day: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="Enter day"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Date
+                </label>
+                <div className="relative">
+                  <DatePicker
+                    selected={newClass.startDate}
+                    onChange={(date) => setNewClass({...newClass, startDate: date})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    dateFormat="MMMM d, yyyy"
+                    placeholderText="Select start date"
+                    minDate={new Date()}
+                  />
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                    <FiCalendar className="text-gray-400" />
+                  </div>
+                </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4">

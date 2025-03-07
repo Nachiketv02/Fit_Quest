@@ -37,38 +37,22 @@ module.exports.createInstructor = async (req, res) => {
   }
 };
 
-// module.exports.getAllInstructors = async (req, res) => {
-//   try {
-//     const instructors = await instructorModel.find({});
-//     return res.status(200).json({ instructors });
-//   } catch (error) {
-//     console.log("Error in getAllInstructors Controller:", error.message);
-//     return res.status(500).json({ error: error.message });
-//   }
-// };
-
 module.exports.getAllInstructors = async (req, res) => {
   try {
-    // Extract page and limit from query parameters (default to page 1 and limit 10 if not provided)
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = parseInt(req.query.limit) || 5;
 
-    // Calculate the number of documents to skip
     const skip = (page - 1) * limit;
-
-    // Fetch instructors with pagination
+    
     const instructors = await instructorModel
       .find({})
-      .skip(skip) // Skip the first `skip` documents
-      .limit(limit); // Limit the result to `limit` documents
+      .skip(skip)
+      .limit(limit);
 
-    // Get the total number of instructors (for calculating total pages)
     const totalInstructors = await instructorModel.countDocuments({});
 
-    // Calculate total pages
     const totalPages = Math.ceil(totalInstructors / limit);
 
-    // Return the response with pagination details
     return res.status(200).json({
       instructors,
       pagination: {
