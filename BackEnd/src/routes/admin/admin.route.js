@@ -41,4 +41,20 @@ router.post('/classes',authMiddleware.isAuthenticated, authMiddleware.isAdmin ,[
     body('description').isString().withMessage("Description must be a string") 
 ], adminClassesController.createClass);
 
+router.get('/classes', authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminClassesController.getAllClasses);
+
+router.get('/classes/search', authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminClassesController.searchClasses);
+
+router.put('/classes/:id',authMiddleware.isAuthenticated, authMiddleware.isAdmin ,[
+    body("className").isLength({ min: 3 }).withMessage("Class Name must be at least 3 characters long"),
+    body('startDate').isDate().withMessage("Start Date must be a date"),
+    body('times').isString().withMessage("Times must be a string"),
+    body('duration').isString().withMessage("Duration must be a string"),
+    body('capacity').isInt().withMessage("Capacity must be an integer"),
+    body('room').isIn(["Studio A", "Studio B", "Studio C", "Studio D", "Studio E"]).withMessage("Room must be a valid room"),
+    body('description').isString().withMessage("Description must be a string") 
+], adminClassesController.updateClass);
+
+router.delete('/classes/:id',authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminClassesController.deleteClass);
+
 module.exports = router;
