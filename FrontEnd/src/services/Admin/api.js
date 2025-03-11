@@ -55,3 +55,66 @@ export const searchInstructors = async (q, page, limit) => {
     throw error;
   }
 };
+
+//classes
+
+export const getAllInstructors = async () => {
+  try {
+    const response = await api.get('/instructors/all');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching instructors:', error);
+    throw error;
+  }
+};
+
+export const getClasses = async () => {
+  try{
+    const response = await api.get('/classes'); 
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error('Failed to fetch classes');
+    }
+  } catch(error){
+    console.log('Error fetching classes:', error);
+    throw error;
+  }
+};
+
+export const addClass = async (classData) => {
+  try {
+    const response = await api.post('/classes', classData);
+    if (response.status === 201) {
+      return response.data;
+    } else {
+      throw new Error('Failed to add class');
+    }
+  } catch (error) {
+    console.error('Error adding class:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const updateClass = async (id, classData) => {
+  try {
+    const response = await api.put(`/classes/${id}`, classData);
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error('Failed to update class');
+    }
+  } catch (error) {
+    console.error('Error updating class:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const deleteClass = async (id) => {
+  try {
+    await api.delete(`/classes/${id}`);
+  } catch (error) {
+    console.error('Error deleting class:', error.response?.data || error.message);
+    throw error;
+  }
+};  

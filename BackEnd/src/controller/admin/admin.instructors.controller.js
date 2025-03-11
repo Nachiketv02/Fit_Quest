@@ -144,3 +144,14 @@ module.exports.searchInstructors = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+module.exports.getAllInstructorss = async (req, res) => {
+  try {
+    const instructors = await instructorModel.find();
+    return res.status(200).json({ instructors });
+  } catch (error) {
+    console.log("Error in getAllInstructors Controller:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+};
+

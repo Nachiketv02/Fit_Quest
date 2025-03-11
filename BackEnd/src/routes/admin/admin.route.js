@@ -57,4 +57,6 @@ router.put('/classes/:id',authMiddleware.isAuthenticated, authMiddleware.isAdmin
 
 router.delete('/classes/:id',authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminClassesController.deleteClass);
 
+router.get('/instructors/all', authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminInstructorsController.getAllInstructorss);
+
 module.exports = router;

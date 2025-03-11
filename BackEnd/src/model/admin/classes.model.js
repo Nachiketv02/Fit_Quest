@@ -10,7 +10,7 @@ const classSchema = new mongoose.Schema({
     category : {
         type : String,
         required : true,
-        enum : ["cardio", "strength", "yoga & Flexibility", "hiit", "dance"]
+        enum : ["cardio", "strength", "yoga & flexibility", "hiit", "dance"]
     },
     instructor : {
         type : mongoose.Schema.Types.ObjectId,

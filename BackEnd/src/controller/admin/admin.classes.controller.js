@@ -31,7 +31,9 @@ module.exports.createClass = async (req, res) => {
             description
         });
 
-        return res.status(201).json({ message: "Class created successfully", newClass });
+        const populatedClass = await classesModel.findById(newClass._id).populate('instructor');
+
+        return res.status(201).json({ message: "Class created successfully", newClass: populatedClass });
 
     } catch (error) {
         console.log("Error in createClass Controller:", error.message);
@@ -41,8 +43,8 @@ module.exports.createClass = async (req, res) => {
 
 module.exports.getAllClasses = async (req, res) => {
     try {
-        const classes = await classesModel.find();
-        return res.status(200).json({ classes });
+        const classes = await classesModel.find().populate('instructor');
+        return res.status(200).json({ classes: classes.map(c => ({ ...c._doc, instructor: c.instructor._doc })) });
     } catch (error) {
         console.log("Error in getAllClasses Controller:", error.message);
         return res.status(500).json({ message: error.message });
@@ -74,6 +76,11 @@ module.exports.updateClass = async (req, res) => {
             return res.status(400).json({ error: "All fields are required" });
         }
 
+        const existingClass = await classesModel.findOne({ instructor, startDate, times, room });
+        if (existingClass && existingClass._id.toString() !== req.params.id) {
+            return res.status(400).json({ error: "Class already exists" });
+        }
+
         const classToUpdate = await classesModel.findByIdAndUpdate(req.params.id, {
             className,
             category,
@@ -86,7 +93,13 @@ module.exports.updateClass = async (req, res) => {
             description
         });
 
-        return res.status(200).json({ message: "Class updated successfully", classToUpdate });
+        if (!classToUpdate) {
+            return res.status(404).json({ error: "Class not found" });
+        }
+
+        const populatedClass = await classesModel.findById(classToUpdate._id).populate('instructor');
+
+        return res.status(200).json({ message: "Class updated successfully", classToUpdate: populatedClass });
     } catch (error) {
         console.log("Error in updateClass Controller:", error.message);
         return res.status(500).json({ message: error.message });
@@ -96,6 +109,9 @@ module.exports.updateClass = async (req, res) => {
 module.exports.deleteClass = async (req, res) => {
     try {
         const classToDelete = await classesModel.findByIdAndDelete(req.params.id);
+        if (!classToDelete) {
+            return res.status(404).json({ error: "Class not found" });
+        }
         return res.status(200).json({ message: "Class deleted successfully", classToDelete });
     } catch (error) {
         console.log("Error in deleteClass Controller:", error.message);
