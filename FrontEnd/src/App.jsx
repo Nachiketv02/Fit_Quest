@@ -16,12 +16,17 @@ import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Subscription from "./pages/Subscription";
 import Profile from "./pages/Profile";
+import BasicPlan from "./pages/Plan/BasicPlan";
+import PremiumPlan from "./pages/Plan/PremiumPlan";
+import ElitePlan from "./pages/Plan/ElitePlan";
+import MealPlan from "./components/Plan/MealPlan";
 
 //admin side
 import Dashboard from "./pages/Admin/Dashboard";
 import Members from "./pages/Admin/Members";
 import AdminClasses from "./pages/Admin/AdminClasses";
 import InstructorsPage from "./pages/Admin/InstructorsPage";
+
 
 function App() {
   return (
@@ -76,6 +81,10 @@ function App() {
           />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/plans/basic" element={<BasicPlan />} />
+          <Route path="/plans/premium" element={<PremiumPlan />} />
+          <Route path="/plans/elite" element={<ElitePlan />} />
+          <Route path="/meal-plan" element={<MealPlan />} />
 
           {/* admin side */}
           <Route path="/admin/dashboard" element={<Dashboard />} />

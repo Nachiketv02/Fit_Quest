@@ -427,3 +427,53 @@ module.exports.logoutUser = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 };
+
+const calculateEndDate = (startDate, billingCycle) => {
+  const endDate = new Date(startDate);
+  if (billingCycle === "monthly") {
+      endDate.setMonth(endDate.getMonth() + 1); // Add 1 month
+  } else if (billingCycle === "annual") {
+      endDate.setFullYear(endDate.getFullYear() + 1); // Add 1 year
+  }
+  return endDate;
+};
+
+module.exports.updateSubscription = async (req, res) => {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json({ errors: error.array() });
+  }
+
+  const {plan, billingCycle } = req.body;
+
+  try {
+      const user = await userModel.findById(req.user._id);
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      // Set subscription details
+      user.subscription = plan;
+      user.subscriptionStatus = "active";
+      user.subscriptionStartDate = new Date();
+      user.subscriptionEndDate = calculateEndDate(new Date(), billingCycle);
+      user.billingCycle = billingCycle;
+
+      await user.save();
+
+      res.status(200).json({
+          message: "Subscription successful",
+          subscription: {
+              plan: user.subscription,
+              status: user.subscriptionStatus,
+              startDate: user.subscriptionStartDate,
+              endDate: user.subscriptionEndDate,
+              billingCycle: user.billingCycle,
+          },
+      });
+  } catch (error) {
+      console.error("Error subscribing user:", error);
+      res.status(500).json({ message: "Internal server error" });
+  }
+};
+

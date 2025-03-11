@@ -118,3 +118,13 @@ export const deleteClass = async (id) => {
     throw error;
   }
 };  
+
+export const subscriptions = async () => {
+  try {
+    const response = await api.put('/subscriptions');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching subscriptions:', error);
+    throw error;
+  }
+};

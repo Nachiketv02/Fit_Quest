@@ -11,4 +11,19 @@ const deleteExpiredClasses = async () => {
     }
 };
 
+const checkSubscription = async () => {
+    try {
+        const now = new Date();
+        await User.updateMany(
+            { subscriptionEndDate: { $lt: now }, subscriptionStatus: "active" },
+            { $set: { subscriptionStatus: "inactive" } }
+        );
+        console.log("Updated expired subscriptions.");
+    } catch (error) {
+        console.error("Error updating expired subscriptions:", error);
+    }
+};
+
 cron.schedule("0 * * * *", deleteExpiredClasses);
+cron.schedule("0 0 * * *", checkSubscription);
+

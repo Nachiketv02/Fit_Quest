@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const { type } = require("os");
 
 const userSchema = new mongoose.Schema({
     fullName : {
@@ -53,6 +54,27 @@ const userSchema = new mongoose.Schema({
         type : Date,
         // default : Date.now,
         // expires : 86400
+    },
+    subscription : {
+        type : String,
+        enum : ["Basic", "Premium", "Pro", "none"],
+        default : "none"
+    },
+    subscriptionStatus : {
+        type : String,
+        enum : ["active", "inactive"],
+        default : "inactive"
+    },
+    subscriptionStartDate : {
+        type : Date,
+    },
+    subscriptionEndDate : {
+        type : Date,
+    },
+    billingCycle: {
+        type: String,
+        enum: ["monthly", "annual"],
+        default: "monthly"
     },
     createdAt : {
         type : Date,
