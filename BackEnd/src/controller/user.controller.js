@@ -269,7 +269,6 @@ module.exports.verifyUser = async (req, res) => {
     await user.save();
 
     return sendToken(user, 200, "User verified successfully", res);
-
   } catch (error) {
     console.log("Error in verifyUser Controller:", error.message);
     return res.status(500).json({ error: error.message });
@@ -331,7 +330,6 @@ module.exports.loginUser = async (req, res) => {
     }
 
     return sendToken(user, 200, "Login successful", res);
-
   } catch (error) {
     console.log("Error in loginUser Controller:", error.message);
     return res.status(500).json({ error: error.message });
@@ -431,9 +429,9 @@ module.exports.logoutUser = async (req, res) => {
 const calculateEndDate = (startDate, billingCycle) => {
   const endDate = new Date(startDate);
   if (billingCycle === "monthly") {
-      endDate.setMonth(endDate.getMonth() + 1); // Add 1 month
+    endDate.setMonth(endDate.getMonth() + 1); // Add 1 month
   } else if (billingCycle === "annual") {
-      endDate.setFullYear(endDate.getFullYear() + 1); // Add 1 year
+    endDate.setFullYear(endDate.getFullYear() + 1); // Add 1 year
   }
   return endDate;
 };
@@ -444,36 +442,49 @@ module.exports.updateSubscription = async (req, res) => {
     return res.status(400).json({ errors: error.array() });
   }
 
-  const {plan, billingCycle } = req.body;
+  const { plan, billingCycle } = req.body;
 
   try {
-      const user = await userModel.findById(req.user._id);
-      if (!user) {
-          return res.status(404).json({ message: "User not found" });
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (user.subscriptionStatus === 'active') {
+      const planHierarchy = {
+        basic: 1,
+        'basic-annual': 2,
+        premium: 3,
+        'premium-annual': 4,
+        elite: 5,
+        'elite-annual': 6
+      };
+      const currentPlanLevel = planHierarchy[user.subscription.toLowerCase()];
+      const newPlanLevel = planHierarchy[plan.toLowerCase()];
+      if (newPlanLevel <= currentPlanLevel) {
+        return res.status(400).json({ message: `You cannot downgrade from ${user.subscription} to ${plan}.` });
       }
+    }
 
-      // Set subscription details
-      user.subscription = plan;
-      user.subscriptionStatus = "active";
-      user.subscriptionStartDate = new Date();
-      user.subscriptionEndDate = calculateEndDate(new Date(), billingCycle);
-      user.billingCycle = billingCycle;
+    user.subscription = plan;
+    user.subscriptionStatus = "active";
+    user.subscriptionStartDate = new Date();
+    user.subscriptionEndDate = calculateEndDate(new Date(), billingCycle);
+    user.billingCycle = billingCycle;
 
-      await user.save();
+    await user.save();
 
-      res.status(200).json({
-          message: "Subscription successful",
-          subscription: {
-              plan: user.subscription,
-              status: user.subscriptionStatus,
-              startDate: user.subscriptionStartDate,
-              endDate: user.subscriptionEndDate,
-              billingCycle: user.billingCycle,
-          },
-      });
+    return res.status(200).json({
+      message: "Subscription successful",
+      subscription: {
+        plan: user.subscription,
+        status: user.subscriptionStatus,
+        startDate: user.subscriptionStartDate,
+        endDate: user.subscriptionEndDate,
+        billingCycle: user.billingCycle,
+      },
+    });
   } catch (error) {
-      console.error("Error subscribing user:", error);
-      res.status(500).json({ message: "Internal server error" });
+    console.error("Error subscribing user:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
-

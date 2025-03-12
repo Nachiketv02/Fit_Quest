@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const API_BASE_URL = `${import.meta.env.VITE_BASE_URL}/fit-quest/admin`;
 
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
@@ -117,14 +118,4 @@ export const deleteClass = async (id) => {
     console.error('Error deleting class:', error.response?.data || error.message);
     throw error;
   }
-};  
-
-export const subscriptions = async () => {
-  try {
-    const response = await api.put('/subscriptions');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching subscriptions:', error);
-    throw error;
-  }
-};
+}; 

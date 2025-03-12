@@ -1,11 +1,45 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiCheck, FiX, FiHelpCircle } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { updateSubscription } from '../services/User/api';
+
 
 function Subscription() {
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showTooltip, setShowTooltip] = useState(null);
+  const [currentPlan, setCurrentPlan] = useState(null);
+
+  const navigate = useNavigate();
+
+  const handleConfirmPurchase = async () => {
+    if (!selectedPlan) {
+      toast.error('Please select a plan');
+      return;
+    }
+    try {
+      const response = await updateSubscription({ plan: selectedPlan, billingCycle });
+      if (response.message === 'Subscription successful') {
+        toast.success('Subscription successful!');
+        setCurrentPlan(response.subscription.plan);
+        if(response.subscription.plan === 'basic'){
+          navigate('/plans/basic');
+        }
+        else if(response.subscription.plan === 'premium'){
+          navigate('/plans/premium');
+        }
+        else if(response.subscription.plan === 'elite'){
+          navigate('/plans/elite');
+        }
+      } else {
+        toast.error('Failed to select subscription plan');
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
 
   const plans = {
     monthly: [
@@ -129,7 +163,6 @@ function Subscription() {
 
   const handleSelectPlan = (planId) => {
     setSelectedPlan(planId);
-    // In a real application, this would navigate to checkout or show a payment form
     setTimeout(() => {
       window.scrollTo({
         top: document.getElementById('checkout-section').offsetTop - 100,
@@ -327,108 +360,19 @@ function Subscription() {
                   </div>
                 </div>
               </div>
-              
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                      First Name
-                    </label>
-                    <input
-                      type="text"
-                      id="firstName"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      id="lastName"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone Number
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                  />
-                </div>
-                
-                <div className="pt-4 border-t border-gray-200">
-                  <h3 className="text-lg font-semibold mb-4">Payment Information</h3>
-                  
-                  <div className="mb-4">
-                    <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                      Card Number
-                    </label>
-                    <input
-                      type="text"
-                      id="cardNumber"
-                      placeholder="1234 5678 9012 3456"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-6">
-                    <div>
-                      <label htmlFor="expiry" className="block text-sm font-medium text-gray-700 mb-1">
-                        Expiry Date
-                      </label>
-                      <input
-                        type="text"
-                        id="expiry"
-                        placeholder="MM/YY"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="cvc" className="block text-sm font-medium text-gray-700 mb-1">
-                        CVC
-                      </label>
-                      <input
-                        type="text"
-                        id="cvc"
-                        placeholder="123"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                      />
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="pt-4">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    type="submit"
-                    className="w-full bg-primary text-white py-3 px-4 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
-                  >
-                    Complete Purchase
-                  </motion.button>
-                  <p className="text-sm text-gray-500 mt-2 text-center">
-                    By completing your purchase, you agree to our Terms of Service and Privacy Policy.
-                  </p>
-                </div>
-              </form>
+              <div className="pt-4">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleConfirmPurchase}
+                  className="w-full bg-primary text-white py-3 px-4 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                >
+                  Confirm Purchase
+                </motion.button>
+                <p className="text-sm text-gray-500 mt-2 text-center">
+                  By completing your purchase, you agree to our Terms of Service and Privacy Policy.
+                </p>
+              </div>
             </motion.div>
           ) : (
             <div className="text-center py-10">

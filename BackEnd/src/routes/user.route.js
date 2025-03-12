@@ -30,8 +30,8 @@ router.get("/profile",authMiddleware.isAuthenticated,userController.getUserProfi
 router.get('/logout',authMiddleware.isAuthenticated,userController.logoutUser);
 
 router.put('/subscription',authMiddleware.isAuthenticated,[
-    body("plan").isIn(["Basic", "Premium", "Enterprise"]).withMessage("Invalid plan"),
-    body("billingCycle").isIn(["monthly", "yearly"]).withMessage("Invalid billing cycle")
+    body("plan").isIn(["basic", "premium", "elite","basic-annual", "premium-annual", "elite-annual"]).withMessage("Invalid plan"),
+    body("billingCycle").isIn(["monthly", "annual"]).withMessage("Invalid billing cycle")
 ],userController.updateSubscription);
 
 module.exports = router;

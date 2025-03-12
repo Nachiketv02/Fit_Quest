@@ -57,7 +57,7 @@ const userSchema = new mongoose.Schema({
     },
     subscription : {
         type : String,
-        enum : ["Basic", "Premium", "Pro", "none"],
+        enum : ["basic", "premium", "elite", "basic-annual", "premium-annual", "elite-annual", "none"],
         default : "none"
     },
     subscriptionStatus : {
