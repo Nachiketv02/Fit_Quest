@@ -64,4 +64,6 @@ router.get('/instructors/all', authMiddleware.isAuthenticated, authMiddleware.is
 
 router.get('/members', authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminMembersController.getAllMembers);
 
+router.delete('/members/:id',authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminMembersController.deleteMember);
+
 module.exports = router;
