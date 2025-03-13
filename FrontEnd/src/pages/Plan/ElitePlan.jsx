@@ -1,196 +1,285 @@
 import { motion } from 'framer-motion';
-import { FiCheck } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { FiCheck, FiClock, FiCalendar, FiUser, FiAward, FiHeart, FiActivity, FiTarget } from 'react-icons/fi';
 
 function ElitePlan() {
   const features = [
-    { name: 'Access to gym facilities', included: true },
-    { name: 'All gym equipment', included: true },
-    { name: 'Locker room access with towel service', included: true },
-    { name: 'Unlimited group classes', included: true },
-    { name: 'Monthly fitness assessment', included: true },
-    { name: '4 personal training sessions/month', included: true },
-    { name: 'Nutrition consultation', included: true },
-    { name: 'Access to premium classes', included: true },
+    { 
+      name: 'Access to gym facilities',
+      description: '24/7 access to all our premium equipment and facilities',
+      included: true 
+    },
+    { 
+      name: 'All gym equipment',
+      description: 'Full access to our state-of-the-art equipment',
+      included: true 
+    },
+    { 
+      name: 'Locker room access with towel service',
+      description: 'Premium locker room amenities with daily fresh towels',
+      included: true 
+    },
+    { 
+      name: 'Unlimited group classes',
+      description: 'Join any class, anytime with priority booking',
+      included: true 
+    },
+    { 
+      name: 'Monthly fitness assessment',
+      description: 'Regular progress tracking with expert trainers',
+      included: true 
+    },
+    { 
+      name: '4 personal training sessions/month',
+      description: 'One-on-one guidance from elite trainers',
+      included: true 
+    },
+    { 
+      name: 'Nutrition consultation',
+      description: 'Personalized meal plans and nutrition advice',
+      included: true 
+    },
+    { 
+      name: 'Access to premium classes',
+      description: 'Exclusive access to specialized training sessions',
+      included: true 
+    },
+  ];
+
+  const elitePerks = [
+    {
+      icon: FiAward,
+      title: 'Priority Access',
+      description: 'Get first access to new classes and equipment'
+    },
+    {
+      icon: FiHeart,
+      title: 'Recovery Zone',
+      description: 'Access to spa and recovery facilities'
+    },
+    {
+      icon: FiActivity,
+      title: 'Performance Tracking',
+      description: 'Advanced fitness metrics and analysis'
+    },
+    {
+      icon: FiTarget,
+      title: 'Goal Setting',
+      description: 'Personalized workout programming'
+    }
   ];
 
   const classes = [
-    { name: 'Elite HIIT', time: 'Daily 6:00 AM' },
-    { name: 'Advanced Power Cycling', time: 'Mon, Wed, Fri 7:00 AM' },
-    { name: 'Olympic Weightlifting', time: 'Tue, Thu 6:00 PM' },
-    { name: 'Advanced Yoga', time: 'Mon, Wed, Fri 8:00 PM' },
-    { name: 'Boxing', time: 'Tue, Thu 7:00 PM' },
-    { name: 'CrossFit', time: 'Daily 5:00 PM' },
+    {
+      name: 'Elite HIIT',
+      time: 'Daily 6:00 AM',
+      instructor: 'Alex Rivera',
+      image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=300&h=200&fit=crop'
+    },
+    {
+      name: 'Advanced Power Cycling',
+      time: 'Mon, Wed, Fri 7:00 AM',
+      instructor: 'Maya Johnson',
+      image: 'https://images.unsplash.com/photo-1534258936925-c58bed479fcb?w=300&h=200&fit=crop'
+    },
+    {
+      name: 'Olympic Weightlifting',
+      time: 'Tue, Thu 6:00 PM',
+      instructor: 'James Wilson',
+      image: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=300&h=200&fit=crop'
+    },
+    {
+      name: 'Advanced Yoga',
+      time: 'Mon, Wed, Fri 8:00 PM',
+      instructor: 'Sophia Chen',
+      image: 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=300&h=200&fit=crop'
+    }
   ];
 
   return (
     <div className="pt-20 bg-gray-50 min-h-screen">
-      {/* Welcome Banner */}
-      <section className="bg-purple-600 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Hero Section */}
+      <section className="relative py-20 overflow-hidden">
+        <div className="absolute inset-0">
+          <img 
+            src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48"
+            alt="Elite fitness"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black to-black/70" />
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center"
+            className="text-center text-white"
           >
-            <h1 className="text-4xl font-bold mb-4">Welcome to Elite Membership</h1>
-            <p className="text-xl opacity-90">Experience the ultimate in fitness luxury and performance</p>
+            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+              Welcome to <span className="text-gradient">Elite</span>
+            </h1>
+            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+              Experience fitness excellence with our most comprehensive membership package
+            </p>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="flex flex-wrap justify-center gap-4"
+            >
+              <Link
+                to="/schedule"
+                className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300"
+              >
+                View Schedule
+              </Link>
+              <Link
+                to="/subscription/elite/meal-plan"
+                className="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300 backdrop-blur-sm"
+              >
+                View Meal Plan
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Features Section */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="bg-white rounded-xl shadow-md p-6"
-          >
-            <h2 className="text-2xl font-bold mb-6">Your Elite Features</h2>
-            <div className="space-y-4">
-              {features.map((feature, index) => (
-                <div
-                  key={index}
-                  className="flex items-center space-x-3"
-                >
-                  <FiCheck className="text-green-500 flex-shrink-0" />
-                  <span className="text-gray-800">{feature.name}</span>
+      {/* Elite Perks */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Elite Member Perks</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Enjoy exclusive benefits designed for peak performance and luxury comfort
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-8">
+            {elitePerks.map((perk, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-gray-50 rounded-xl p-6 text-center"
+              >
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <perk.icon className="w-8 h-8 text-primary" />
                 </div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Available Classes */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="bg-white rounded-xl shadow-md p-6"
-          >
-            <h2 className="text-2xl font-bold mb-6">Elite Classes</h2>
-            <div className="space-y-4">
-              {classes.map((classItem, index) => (
-                <div
-                  key={index}
-                  className="border border-gray-200 rounded-lg p-4"
-                >
-                  <h3 className="font-semibold text-lg">{classItem.name}</h3>
-                  <p className="text-gray-600">{classItem.time}</p>
-                  <button className="mt-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
-                    Book Class
-                  </button>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Elite Services */}
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6">Elite Services</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-white rounded-xl shadow-md p-6"
-            >
-              <h3 className="font-bold text-lg mb-2">Personal Training</h3>
-              <p className="text-gray-600 mb-4">
-                Schedule your 4 monthly sessions with our elite trainers
-              </p>
-              <div className="space-y-2">
-                <button className="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
-                  Book Session
-                </button>
-                <button className="w-full border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors">
-                  View Schedule
-                </button>
-              </div>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-white rounded-xl shadow-md p-6"
-            >
-              <h3 className="font-bold text-lg mb-2">Nutrition Consultation</h3>
-              <p className="text-gray-600 mb-4">
-                Get personalized nutrition advice from our experts
-              </p>
-              <div className="space-y-2">
-                <button className="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
-                  Schedule Consultation
-                </button>
-                <button className="w-full border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors">
-                  View Meal Plans
-                </button>
-              </div>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-white rounded-xl shadow-md p-6"
-            >
-              <h3 className="font-bold text-lg mb-2">Fitness Assessment</h3>
-              <p className="text-gray-600 mb-4">
-                Track your progress with monthly assessments
-              </p>
-              <div className="space-y-2">
-                <button className="w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
-                  Book Assessment
-                </button>
-                <button className="w-full border border-purple-600 text-purple-600 px-4 py-2 rounded-lg hover:bg-purple-50 transition-colors">
-                  View Progress
-                </button>
-              </div>
-            </motion.div>
+                <h3 className="text-xl font-bold mb-2">{perk.title}</h3>
+                <p className="text-gray-600">{perk.description}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* Additional Benefits */}
-        <div className="mt-12 bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-2xl font-bold mb-6">Additional Elite Benefits</h2>
-          <div className="grid md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-              </div>
-              <h3 className="font-bold mb-2">Priority Booking</h3>
-              <p className="text-gray-600">Early access to class registration</p>
-            </div>
+      {/* Features Grid */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Elite Features</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Everything you need for your fitness journey, and more
+            </p>
+          </div>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="font-bold mb-2">Guest Passes</h3>
-              <p className="text-gray-600">Bring friends monthly</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="font-bold mb-2">Retail Discount</h3>
-              <p className="text-gray-600">20% off gym store</p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3 className="font-bold mb-2">Spa Access</h3>
-              <p className="text-gray-600">Complimentary spa services</p>
-            </div>
+          <div className="grid md:grid-cols-2 gap-6">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                      <FiCheck className="w-5 h-5 text-primary" />
+                    </div>
+                  </div>
+                  <div className="ml-4">
+                    <h3 className="text-lg font-semibold mb-1">{feature.name}</h3>
+                    <p className="text-gray-600">{feature.description}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Elite Classes */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold mb-4">Elite Classes</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Exclusive access to our most advanced training sessions
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {classes.map((classItem, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-gray-50 rounded-xl overflow-hidden"
+              >
+                <div className="h-48 overflow-hidden">
+                  <img 
+                    src={classItem.image} 
+                    alt={classItem.name}
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="font-bold text-lg mb-2">{classItem.name}</h3>
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-center">
+                      <FiClock className="mr-2" />
+                      {classItem.time}
+                    </div>
+                    <div className="flex items-center">
+                      <FiUser className="mr-2" />
+                      {classItem.instructor}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-primary to-primary/80 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-3xl font-bold mb-4">Ready to Start?</h2>
+            <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
+              Begin your elite fitness journey today and transform your life
+            </p>
+            <motion.button 
+              className="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Schedule a Tour
+            </motion.button>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 }

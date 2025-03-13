@@ -1,10 +1,11 @@
 const classesModel = require('../model/admin/classes.model');
 const cron = require("node-cron");
+const userModel = require('../model/user.model');
 
 const deleteExpiredClasses = async () => {
     try {
         const now = new Date();
-        const result = await Classes.deleteMany({ startDate: { $lt: now } });
+        const result = await classesModel.deleteMany({ startDate: { $lt: now } });
         console.log(`Deleted ${result.deletedCount} expired classes.`);
     } catch (error) {
         console.error("Error deleting expired classes:", error);
@@ -14,7 +15,7 @@ const deleteExpiredClasses = async () => {
 const checkSubscription = async () => {
     try {
         const now = new Date();
-        await User.updateMany(
+        await userModel.updateMany(
             { subscriptionEndDate: { $lt: now }, subscriptionStatus: "active" },
             { $set: { subscriptionStatus: "inactive" } }
         );

@@ -8,7 +8,8 @@ const UserContext = ({children}) => {
         fullName : '',
         email : '',
         phone : '',
-        gender : ''
+        gender : '',
+        plan : ''
     });
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);

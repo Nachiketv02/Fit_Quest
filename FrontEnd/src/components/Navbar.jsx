@@ -27,7 +27,18 @@ function Navbar() {
     { name: "Classes", path: "/classes" },
     { name: "Trainers", path: "/trainers" },
     { name: "Membership", path: "/subscription" },
-  ]; 
+  ];
+
+  // Add plan-specific links only if the user is authenticated
+  if (isAuthenticated) {
+    if (userData?.subscription === 'basic' || userData?.subscription === 'basic-annual') {
+      navLinks.push({ name: "Basic Plan", path: "/subscription/basic" });
+    } else if (userData?.subscription === 'premium' || userData?.subscription === 'premium-annual') {
+      navLinks.push({ name: "Premium Plan", path: "/subscription/premium" });
+    } else if (userData?.subscription === 'elite' || userData?.subscription === 'elite-annual') {
+      navLinks.push({ name: "Elite Plan", path: "/subscription/elite" });
+    }
+  }
 
   const handleLogout = async () => {
     try {

@@ -81,10 +81,10 @@ function App() {
           />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/plans/basic" element={<BasicPlan />} />
-          <Route path="/plans/premium" element={<PremiumPlan />} />
-          <Route path="/plans/elite" element={<ElitePlan />} />
-          <Route path="/meal-plan" element={<MealPlan />} />
+          <Route path="/subscription/basic" element={<ProtectedRoute><BasicPlan /></ProtectedRoute>} />
+          <Route path="/subscription/premium" element={<ProtectedRoute><PremiumPlan /></ProtectedRoute>} />
+          <Route path="/subscription/elite" element={<ProtectedRoute><ElitePlan /></ProtectedRoute>} />
+          <Route path="/subscription/elite/meal-plan" element={<ProtectedRoute><MealPlan /></ProtectedRoute>} />
 
           {/* admin side */}
           <Route path="/admin/dashboard" element={<Dashboard />} />

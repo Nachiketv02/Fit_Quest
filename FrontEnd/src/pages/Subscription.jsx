@@ -4,13 +4,16 @@ import { FiCheck, FiX, FiHelpCircle } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { updateSubscription } from '../services/User/api';
-
+import { UserDataContext } from "../context/UserContext"; 
+import { useContext } from 'react';
 
 function Subscription() {
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [showTooltip, setShowTooltip] = useState(null);
   const [currentPlan, setCurrentPlan] = useState(null);
+
+  const { userData , setUserData} = useContext(UserDataContext);
 
   const navigate = useNavigate();
 
@@ -23,6 +26,7 @@ function Subscription() {
       const response = await updateSubscription({ plan: selectedPlan, billingCycle });
       if (response.message === 'Subscription successful') {
         toast.success('Subscription successful!');
+        setUserData({ ...userData, plan: response.subscription.plan });
         setCurrentPlan(response.subscription.plan);
         if(response.subscription.plan === 'basic'){
           navigate('/plans/basic');
