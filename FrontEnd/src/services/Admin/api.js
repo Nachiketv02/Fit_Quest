@@ -118,4 +118,21 @@ export const deleteClass = async (id) => {
     console.error('Error deleting class:', error.response?.data || error.message);
     throw error;
   }
-}; 
+};
+
+//members
+
+export const getAllMembers = async () => {
+  try {
+    const response = await api.get('/members');
+    console.log('Members response:', response.data.data);
+    if (response.status === 200) {
+      return response.data.data;
+    } else {
+      throw new Error('Failed to fetch members');
+    }
+  } catch (error) {
+    console.error('Error fetching members:', error);
+    throw error;
+  }
+};
