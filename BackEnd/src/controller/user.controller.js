@@ -465,6 +465,7 @@ module.exports.updateSubscription = async (req, res) => {
       }
     }
 
+    user.isSubscribed = true;
     user.subscription = plan;
     user.subscriptionStatus = "active";
     user.subscriptionStartDate = new Date();

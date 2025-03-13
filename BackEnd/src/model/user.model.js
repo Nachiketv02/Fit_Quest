@@ -55,6 +55,10 @@ const userSchema = new mongoose.Schema({
         // default : Date.now,
         // expires : 86400
     },
+    isSubscribed : {
+        type : Boolean,
+        default : false
+    },
     subscription : {
         type : String,
         enum : ["basic", "premium", "elite", "basic-annual", "premium-annual", "elite-annual", "none"],

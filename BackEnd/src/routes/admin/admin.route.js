@@ -4,6 +4,7 @@ const authMiddleware = require("../../middleware/auth.middleware");
 const {body} = require("express-validator");
 const adminInstructorsController = require("../../controller/admin/admin.instructors.controller");
 const adminClassesController = require("../../controller/admin/admin.classes.controller");
+const adminMembersController = require("../../controller/admin/admin.member.controller");
 
 //instructors
 
@@ -59,6 +60,8 @@ router.delete('/classes/:id',authMiddleware.isAuthenticated, authMiddleware.isAd
 
 router.get('/instructors/all', authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminInstructorsController.getAllInstructorss);
 
+//members
 
+router.get('/members', authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminMembersController.getAllMembers);
 
 module.exports = router;
