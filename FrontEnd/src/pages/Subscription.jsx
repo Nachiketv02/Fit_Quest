@@ -26,16 +26,26 @@ function Subscription() {
       const response = await updateSubscription({ plan: selectedPlan, billingCycle });
       if (response.message === 'Subscription successful') {
         toast.success('Subscription successful!');
-        setUserData({ ...userData, plan: response.subscription.plan });
+        const updatedUserData = {
+          ...userData,
+          subscription: response.subscription.plan,
+          isSubscribed: response.subscription.isSubscribed,
+          subscriptionStatus: response.subscription.status,
+          subscriptionStartDate: response.subscription.startDate,
+          subscriptionEndDate: response.subscription.endDate,
+          billingCycle: response.subscription.billingCycle,
+        };
+        setUserData(updatedUserData);
+        localStorage.setItem("user", JSON.stringify(updatedUserData));
         setCurrentPlan(response.subscription.plan);
         if(response.subscription.plan === 'basic'){
-          navigate('/plans/basic');
+          navigate('/subscription/basic');
         }
         else if(response.subscription.plan === 'premium'){
-          navigate('/plans/premium');
+          navigate('/subscription/premium');
         }
         else if(response.subscription.plan === 'elite'){
-          navigate('/plans/elite');
+          navigate('/subscription/elite');
         }
       } else {
         toast.error('Failed to select subscription plan');

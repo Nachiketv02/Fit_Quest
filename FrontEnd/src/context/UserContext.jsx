@@ -5,11 +5,16 @@ export const UserDataContext = createContext()
 const UserContext = ({children}) => {
 
     const [userData , setUserData] = useState({
-        fullName : '',
-        email : '',
-        phone : '',
-        gender : '',
-        plan : ''
+      fullName: '',
+      email: '',
+      phone: '',
+      gender: '',
+      plan: '',
+      isSubscribed: false,
+      subscriptionStatus: '',
+      subscriptionStartDate: null,
+      subscriptionEndDate: null,
+      billingCycle: '',
     });
 
     const [isAuthenticated, setIsAuthenticated] = useState(false);

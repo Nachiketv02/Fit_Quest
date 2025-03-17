@@ -477,6 +477,7 @@ module.exports.updateSubscription = async (req, res) => {
     return res.status(200).json({
       message: "Subscription successful",
       subscription: {
+        isSubscribed: user.isSubscribed,
         plan: user.subscription,
         status: user.subscriptionStatus,
         startDate: user.subscriptionStartDate,

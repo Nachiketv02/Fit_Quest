@@ -73,6 +73,7 @@ function OtpVerification() {
       if (response.status === 200) {
         setUserData(response.data.user);
         localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         setIsVerified(true);
         setIsAuthenticated(true);
         setTimeout(() => navigate("/classes"), 1500);

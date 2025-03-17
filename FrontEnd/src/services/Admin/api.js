@@ -136,3 +136,12 @@ export const getAllMembers = async () => {
     throw error;
   }
 };
+
+export const deleteMember = async (id) => {
+  try {
+    await api.delete(`/members/${id}`);
+  } catch (error) {
+    console.error('Error deleting member:', error.response?.data || error.message);
+    throw error;
+  }
+};

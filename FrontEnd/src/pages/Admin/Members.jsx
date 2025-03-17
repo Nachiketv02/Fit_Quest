@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { FiSearch, FiFilter, FiEdit, FiTrash2, FiPlus, FiX, FiCheck, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import AdminSidebar from '../../components/Admin/AdminSidebar';
 import AdminHeader from '../../components/Admin/AdminHeader';
-import { getAllMembers } from '../../services/Admin/api';
+import { getAllMembers ,deleteMember } from '../../services/Admin/api';
 
 function Members() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -23,6 +23,7 @@ function Members() {
   });
 
   const [membersData, setMembersData] = useState([]);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -42,22 +43,6 @@ function Members() {
     fetchMembers();
   }, []);
 
-  // Sample members data
-  // const membersData = [
-  //   { id: 1, name: 'Sarah Johnson', email: 'sarah.j@example.com', phone: '(555) 123-4567', plan: 'Premium', status: 'Active', joinDate: '2023-01-15', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop' },
-  //   { id: 2, name: 'Michael Chen', email: 'michael.c@example.com', phone: '(555) 234-5678', plan: 'Elite', status: 'Active', joinDate: '2023-02-20', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop' },
-  //   { id: 3, name: 'Emily Rodriguez', email: 'emily.r@example.com', phone: '(555) 345-6789', plan: 'Basic', status: 'Active', joinDate: '2023-03-05', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop' },
-  //   { id: 4, name: 'David Kim', email: 'david.k@example.com', phone: '(555) 456-7890', plan: 'Premium', status: 'Inactive', joinDate: '2023-01-10', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=50&h=50&fit=crop' },
-  //   { id: 5, name: 'Jessica Williams', email: 'jessica.w@example.com', phone: '(555) 567-8901', plan: 'Basic', status: 'Active', joinDate: '2023-04-15', image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=50&h=50&fit=crop' },
-  //   { id: 6, name: 'Robert Taylor', email: 'robert.t@example.com', phone: '(555) 678-9012', plan: 'Elite', status: 'Active', joinDate: '2023-02-28', image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=50&h=50&fit=crop' },
-  //   { id: 7, name: 'Amanda Martinez', email: 'amanda.m@example.com', phone: '(555) 789-0123', plan: 'Premium', status: 'Active', joinDate: '2023-03-20', image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=50&h=50&fit=crop' },
-  //   { id: 8, name: 'Daniel Lee', email: 'daniel.l@example.com', phone: '(555) 890-1234', plan: 'Basic', status: 'Inactive', joinDate: '2023-01-05', image: 'https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=50&h=50&fit=crop' },
-  //   { id: 9, name: 'Sophia Garcia', email: 'sophia.g@example.com', phone: '(555) 901-2345', plan: 'Premium', status: 'Active', joinDate: '2023-04-02', image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=50&h=50&fit=crop' },
-  //   { id: 10, name: 'James Wilson', email: 'james.w@example.com', phone: '(555) 012-3456', plan: 'Elite', status: 'Active', joinDate: '2023-03-15', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop' },
-  // ];
-
-  // Filter and search members
-  console.log('Members data:', membersData);
   const filteredMembers = membersData.filter(member => {
     const matchesSearch = member.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          member.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -84,11 +69,16 @@ function Members() {
     setShowDeleteModal(true);
   };
 
-  const handleDeleteConfirm = () => {
-    // In a real app, you would delete the member from the database
-    console.log(`Deleting member: ${memberToDelete.id}`);
-    setShowDeleteModal(false);
-    setMemberToDelete(null);
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteMember(memberToDelete._id);
+      fetchMembers();
+      setShowDeleteModal(false);
+      setMemberToDelete(null);
+    } catch (error) {
+      console.error('Error deleting member:', error);
+      setError(error.message);
+    }
   };
 
   const handleAddMember = () => {
