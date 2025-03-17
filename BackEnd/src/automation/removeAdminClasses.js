@@ -25,6 +25,12 @@ const checkSubscription = async () => {
     }
 };
 
-cron.schedule("0 * * * *", deleteExpiredClasses);
-cron.schedule("0 0 * * *", checkSubscription);
+cron.schedule("0 * * * *", () => {
+    console.log("Running deleteExpiredClasses job");
+    deleteExpiredClasses();
+});
 
+cron.schedule("0 0 * * *", () => {
+    console.log("Running checkSubscription job");
+    checkSubscription();
+});

@@ -9,6 +9,7 @@ const userRouter = require("./routes/user.route");
 const adminRouter = require("./routes/admin/admin.route");
 
 connectDB();
+require("./automation/removeAdminClasses");
 
 app.use(
   cors({
