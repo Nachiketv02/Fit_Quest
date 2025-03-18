@@ -14,12 +14,14 @@ import {
   FiCalendar
 } from 'react-icons/fi';
 import { getAllInstructors } from '../services/Admin/api';
+import { useNavigate } from 'react-router-dom';
 
 function Trainers() {
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [trainers, setTrainers] = useState([]);
-
+  const navigate = useNavigate();
+  
   const filters = [
     { id: 'all', name: 'All Trainers' },
     { id: 'strength', name: 'Strength & Conditioning' },
@@ -309,6 +311,7 @@ function Trainers() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
+                    onClick={() => navigate('/trainers/trainer-application')}
                     className="bg-white text-gray-900 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300"
                   >
                     Apply Now

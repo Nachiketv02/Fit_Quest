@@ -19,9 +19,9 @@ import {
   addInstructor,
   updateInstructor,
   deleteInstructor,
-  searchInstructors
+  searchInstructors,
 } from "../../services/Admin/api";
-import debounce from 'lodash/debounce';
+import debounce from "lodash/debounce";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -37,7 +37,7 @@ function InstructorsPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const instructorsPerPage = 5;
@@ -52,7 +52,11 @@ function InstructorsPage() {
     try {
       let data;
       if (searchQuery) {
-        const searchResult = await searchInstructors(searchQuery, currentPage, instructorsPerPage);
+        const searchResult = await searchInstructors(
+          searchQuery,
+          currentPage,
+          instructorsPerPage
+        );
         data = searchResult.instructors;
         setTotalPages(Math.ceil(searchResult.total / instructorsPerPage));
       } else {
@@ -62,7 +66,7 @@ function InstructorsPage() {
       }
       setInstructors(data);
     } catch (err) {
-      setError(err.message || 'Failed to fetch instructors.');
+      setError(err.message || "Failed to fetch instructors.");
       console.error("Fetch instructors error:", err);
     } finally {
       setLoading(false);
@@ -92,7 +96,7 @@ function InstructorsPage() {
       experience: "",
       certifications: "",
     });
-  
+
     const handleAddInstructor = async (e) => {
       e.preventDefault();
       const newInstructor = {
@@ -105,7 +109,7 @@ function InstructorsPage() {
         experience: formData.experience,
         certifications: formData.certifications,
       };
-  
+
       try {
         const data = await addInstructor(newInstructor);
         if (data && data._id) {
@@ -129,9 +133,9 @@ function InstructorsPage() {
         console.log(error.message);
       }
     };
-  
+
     if (!isOpen) return null;
-  
+
     return (
       <>
         <div
@@ -147,7 +151,7 @@ function InstructorsPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
             Add New Instructor
           </h2>
-  
+
           <form className="space-y-6" onSubmit={handleAddInstructor}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -164,7 +168,7 @@ function InstructorsPage() {
                   }
                 />
               </div>
-  
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Title
@@ -176,7 +180,9 @@ function InstructorsPage() {
                     setFormData({ ...formData, title: e.target.value })
                   }
                 >
-                  <option value="" disabled>Select Title</option>
+                  <option value="" disabled>
+                    Select Title
+                  </option>
                   <option value="strength">Strength & Conditioning</option>
                   <option value="cardio">Cardio</option>
                   <option value="yoga & flexibility">Yoga & Flexibility</option>
@@ -185,7 +191,7 @@ function InstructorsPage() {
                   <option value="nutrition">Nutrition</option>
                 </select>
               </div>
-  
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email
@@ -200,7 +206,7 @@ function InstructorsPage() {
                   }
                 />
               </div>
-  
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Phone Number
@@ -215,22 +221,22 @@ function InstructorsPage() {
                   }
                 />
               </div>
-  
+
               <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Specialties
-              </label>
-              <input
-                type="text"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-                placeholder="Yoga, Cardio, Nutrition"
-                value={formData.specialties}
-                onChange={(e) =>
-                  setFormData({ ...formData, specialties: e.target.value })
-                }
-              />
-            </div>
-  
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Specialties
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="Yoga, Cardio, Nutrition"
+                  value={formData.specialties}
+                  onChange={(e) =>
+                    setFormData({ ...formData, specialties: e.target.value })
+                  }
+                />
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Profile Image URL
@@ -245,7 +251,7 @@ function InstructorsPage() {
                   }
                 />
               </div>
-  
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Experience
@@ -260,7 +266,7 @@ function InstructorsPage() {
                   }
                 />
               </div>
-  
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Number of Certifications
@@ -276,7 +282,7 @@ function InstructorsPage() {
                 />
               </div>
             </div>
-  
+
             <div className="flex justify-end space-x-4 mt-8">
               <button
                 type="button"
@@ -309,7 +315,7 @@ function InstructorsPage() {
       experience: "",
       certifications: "",
     });
-  
+
     useEffect(() => {
       if (instructor) {
         setFormData({
@@ -324,9 +330,9 @@ function InstructorsPage() {
         });
       }
     }, [instructor]);
-  
+
     const handleEditInstructor = async (e) => {
-      e.preventDefault(); 
+      e.preventDefault();
       const updatedInstructor = {
         fullName: formData.fullName,
         title: formData.title,
@@ -337,13 +343,15 @@ function InstructorsPage() {
         experience: formData.experience,
         certifications: formData.certifications,
       };
-  
+
       try {
         const data = await updateInstructor(instructor._id, updatedInstructor);
-  
+
         if (data && data._id) {
           setInstructors((prevInstructors) =>
-            prevInstructors.map((inst) => (inst._id === instructor._id ? data : inst))
+            prevInstructors.map((inst) =>
+              inst._id === instructor._id ? data : inst
+            )
           );
           toast.success("Instructor updated successfully");
           onClose();
@@ -354,9 +362,9 @@ function InstructorsPage() {
         console.error("Error updating instructor:", error);
       }
     };
-  
+
     if (!isOpen) return null;
-  
+
     return (
       <>
         <div
@@ -372,7 +380,7 @@ function InstructorsPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
             Edit Instructor
           </h2>
-  
+
           <form className="space-y-6" onSubmit={handleEditInstructor}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -389,7 +397,7 @@ function InstructorsPage() {
                   }
                 />
               </div>
-  
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Title
@@ -401,7 +409,9 @@ function InstructorsPage() {
                     setFormData({ ...formData, title: e.target.value })
                   }
                 >
-                  <option value="" disabled>Select Title</option>
+                  <option value="" disabled>
+                    Select Title
+                  </option>
                   <option value="strength">Strength & Conditioning</option>
                   <option value="cardio">Cardio</option>
                   <option value="yoga & flexibility">Yoga & Flexibility</option>
@@ -410,7 +420,7 @@ function InstructorsPage() {
                   <option value="nutrition">Nutrition</option>
                 </select>
               </div>
-  
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email
@@ -425,7 +435,7 @@ function InstructorsPage() {
                   }
                 />
               </div>
-  
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Phone Number
@@ -440,7 +450,7 @@ function InstructorsPage() {
                   }
                 />
               </div>
-  
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Specialties
@@ -455,7 +465,7 @@ function InstructorsPage() {
                   }
                 />
               </div>
-  
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Profile Image URL
@@ -470,7 +480,7 @@ function InstructorsPage() {
                   }
                 />
               </div>
-  
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Experience
@@ -485,7 +495,7 @@ function InstructorsPage() {
                   }
                 />
               </div>
-  
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Number of Certifications
@@ -501,7 +511,7 @@ function InstructorsPage() {
                 />
               </div>
             </div>
-  
+
             <div className="flex justify-end space-x-4 mt-8">
               <button
                 type="button"
@@ -526,7 +536,7 @@ function InstructorsPage() {
   const debouncedSearch = useCallback(
     debounce((value) => {
       setSearchQuery(value);
-      setCurrentPage(1); 
+      setCurrentPage(1);
     }, 750),
     []
   );
@@ -536,11 +546,11 @@ function InstructorsPage() {
   };
 
   const goToPreviousPage = () => {
-    setCurrentPage(prev => Math.max(prev - 1, 1));
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
   const goToNextPage = () => {
-    setCurrentPage(prev => Math.min(prev + 1, totalPages));
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
   return (
@@ -552,11 +562,7 @@ function InstructorsPage() {
         onClose={() => setIsMobileSidebarOpen(false)}
       />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <AdminHeader
-          title="Instructors"
-          onMenuClick={() => setIsMobileSidebarOpen(true)}
-        />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 mt-20">
           <div className="max-w-7xl mx-auto">
             <div className="bg-white rounded-xl shadow-md p-6 mb-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -566,15 +572,27 @@ function InstructorsPage() {
                   </h1>
                   <p className="text-gray-600">Manage your gym instructors</p>
                 </div>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowAddModal(true)}
-                  className="bg-primary text-white px-4 py-2 rounded-lg flex items-center"
-                >
-                  <FiPlus className="mr-2" />
-                  Add Instructor
-                </motion.button>
+                <div className="flex items-center gap-5">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowRequests(true)}
+                    className="bg-yellow-500 text-white px-4 py-2 rounded-lg flex items-center"
+                  >
+                    <FiAlertTriangle className="mr-2" />
+                    Requests
+                  </motion.button>
+
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowAddModal(true)}
+                    className="bg-primary text-white px-4 py-2 rounded-lg flex items-center"
+                  >
+                    <FiPlus className="mr-2" />
+                    Add Instructor
+                  </motion.button>
+                </div>
               </div>
             </div>
 
@@ -699,7 +717,7 @@ function InstructorsPage() {
                   </tbody>
                 </table>
               </div>
-              
+
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="px-6 py-4 flex items-center justify-between border-t border-gray-200">
@@ -708,9 +726,9 @@ function InstructorsPage() {
                       onClick={goToPreviousPage}
                       disabled={currentPage === 1}
                       className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                        currentPage === 1 
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                        currentPage === 1
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "bg-white text-gray-700 hover:bg-gray-50"
                       }`}
                     >
                       Previous
@@ -719,9 +737,9 @@ function InstructorsPage() {
                       onClick={goToNextPage}
                       disabled={currentPage === totalPages}
                       className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                        currentPage === totalPages 
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                          : 'bg-white text-gray-700 hover:bg-gray-50'
+                        currentPage === totalPages
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "bg-white text-gray-700 hover:bg-gray-50"
                       }`}
                     >
                       Next
@@ -730,49 +748,63 @@ function InstructorsPage() {
                   <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                     <div>
                       <p className="text-sm text-gray-700">
-                        Showing <span className="font-medium">{(currentPage - 1) * instructorsPerPage + 1}</span> to{' '}
+                        Showing{" "}
                         <span className="font-medium">
-                          {Math.min(currentPage * instructorsPerPage, instructors.length)}
-                        </span>{' '}
-                        of <span className="font-medium">{instructors.length}</span> results
+                          {(currentPage - 1) * instructorsPerPage + 1}
+                        </span>{" "}
+                        to{" "}
+                        <span className="font-medium">
+                          {Math.min(
+                            currentPage * instructorsPerPage,
+                            instructors.length
+                          )}
+                        </span>{" "}
+                        of{" "}
+                        <span className="font-medium">
+                          {instructors.length}
+                        </span>{" "}
+                        results
                       </p>
                     </div>
                     <div>
-                      <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                      <nav
+                        className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                        aria-label="Pagination"
+                      >
                         <button
                           onClick={goToPreviousPage}
                           disabled={currentPage === 1}
                           className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${
-                            currentPage === 1 
-                              ? 'text-gray-300 cursor-not-allowed' 
-                              : 'text-gray-500 hover:bg-gray-50'
+                            currentPage === 1
+                              ? "text-gray-300 cursor-not-allowed"
+                              : "text-gray-500 hover:bg-gray-50"
                           }`}
                         >
                           <span className="sr-only">Previous</span>
                           <FiChevronLeft className="h-5 w-5" />
                         </button>
-                        
+
                         {[...Array(totalPages)].map((_, i) => (
                           <button
                             key={i}
                             onClick={() => setCurrentPage(i + 1)}
                             className={`relative inline-flex items-center px-4 py-2 border ${
                               currentPage === i + 1
-                                ? 'z-10 bg-primary border-primary text-white'
-                                : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                ? "z-10 bg-primary border-primary text-white"
+                                : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
                             } text-sm font-medium`}
                           >
                             {i + 1}
                           </button>
                         ))}
-                        
+
                         <button
                           onClick={goToNextPage}
                           disabled={currentPage === totalPages}
                           className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${
-                            currentPage === totalPages 
-                              ? 'text-gray-300 cursor-not-allowed' 
-                              : 'text-gray-500 hover:bg-gray-50'
+                            currentPage === totalPages
+                              ? "text-gray-300 cursor-not-allowed"
+                              : "text-gray-500 hover:bg-gray-50"
                           }`}
                         >
                           <span className="sr-only">Next</span>
@@ -854,7 +886,6 @@ function InstructorsPage() {
         onClose={() => setEditModal({ isOpen: false, instructor: null })}
         instructor={editModal.instructor}
       />
-
     </div>
   );
 }

@@ -1,5 +1,6 @@
 const instructorService = require("../../service/admin/instructors.service");
 const instructorModel = require("../../model/admin/instructor.model");
+const trainerRequestModel = require("../../model/admin/trainerRequest.model");
 const { validationResult } = require("express-validator");
 
 module.exports.createInstructor = async (req, res) => {
@@ -161,3 +162,84 @@ module.exports.getAllInstructorss = async (req, res) => {
   }
 };
 
+module.exports.createTrainerRequest = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { fullName, title, email, phone, specialties, image, experience, certifications } = req.body;
+
+    const trainerRequest = await trainerRequestModel.create({
+      fullName,
+      title,
+      email,
+      phone,
+      specialties: Array.isArray(specialties) ? specialties : [specialties],
+      image,
+      experience,
+      certifications
+    });
+
+    return res.status(201).json({ message: "Trainer request created successfully", trainerRequest });
+  } catch (error) {
+    console.log("Error in createTrainerRequest Controller:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports.getAllTrainerRequests = async (req, res) => {
+  try {
+    const trainerRequests = await trainerRequestModel.find().sort({ createdAt: -1 });
+    return res.status(200).json({ trainerRequests });
+  } catch (error) {
+    console.log("Error in getAllTrainerRequests Controller:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports.approveTrainerRequest = async (req, res) => {
+  try {
+    const trainerRequest = await trainerRequestModel.findById(req.params.id);
+    if (!trainerRequest) {
+      return res.status(404).json({ error: "Trainer request not found" });
+    }
+    
+    const newInstructors = await instructorService.createInstructor({
+      fullName: trainerRequest.fullName,
+      email: trainerRequest.email,
+      phone: trainerRequest.phone,
+      specialties: trainerRequest.specialties,
+      image: trainerRequest.image,
+      title: trainerRequest.title,
+      experience: trainerRequest.experience,
+      certifications: trainerRequest.certifications
+    });
+
+    newInstructors.status = "active";
+    await newInstructors.save();
+
+    await trainerRequestModel.findByIdAndDelete(req.params.id);
+
+    return res.status(200).json({ message: "Trainer request approved successfully" });
+
+  } catch (error) {
+    console.log("Error in approveTrainerRequest Controller:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+module.exports.rejectTrainerRequest = async (req, res) => {
+  try {
+    const trainerRequest = await trainerRequestModel.findById(req.params.id);
+    if (!trainerRequest) {
+      return res.status(404).json({ error: "Trainer request not found" });
+    }
+    await trainerRequestModel.findByIdAndDelete(req.params.id);
+    return res.status(200).json({ message: "Trainer request rejected successfully" });
+  } catch (error) {
+    console.log("Error in rejectTrainerRequest Controller:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+};

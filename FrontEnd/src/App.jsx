@@ -20,6 +20,7 @@ import BasicPlan from "./pages/Plan/BasicPlan";
 import PremiumPlan from "./pages/Plan/PremiumPlan";
 import ElitePlan from "./pages/Plan/ElitePlan";
 import MealPlan from "./components/Plan/MealPlan";
+import TrainerApplication from "./pages/TrainerApplication";
 
 //admin side
 import Dashboard from "./pages/Admin/Dashboard";
@@ -85,6 +86,7 @@ function App() {
           <Route path="/subscription/premium" element={<ProtectedRoute><PremiumPlan /></ProtectedRoute>} />
           <Route path="/subscription/elite" element={<ProtectedRoute><ElitePlan /></ProtectedRoute>} />
           <Route path="/subscription/elite/meal-plan" element={<ProtectedRoute><MealPlan /></ProtectedRoute>} />
+          <Route path="/trainers/trainer-application" element={<ProtectedRoute><TrainerApplication /></ProtectedRoute>} />
 
           {/* admin side */}
           <Route path="/admin/dashboard" element={<Dashboard />} />
