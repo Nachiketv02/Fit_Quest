@@ -1,6 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
+  Bell,
+  X,
+  CheckCircle,
+  XCircle,
+  User,
+  Mail,
+  Phone,
+  Award,
+} from "lucide-react";
+import {
   FiPlus,
   FiSearch,
   FiEdit2,
@@ -20,9 +30,11 @@ import {
   updateInstructor,
   deleteInstructor,
   searchInstructors,
+  getAllTrainerRequests,
+  approveTrainerRequest,
+  rejectTrainerRequest,
 } from "../../services/Admin/api";
 import debounce from "lodash/debounce";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 function InstructorsPage() {
@@ -37,6 +49,8 @@ function InstructorsPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showRequests, setShowRequests] = useState(false);
+  const [requests, setRequests] = useState([]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -44,6 +58,7 @@ function InstructorsPage() {
 
   useEffect(() => {
     fetchInstructors();
+    fetchRequests();
   }, [searchQuery, currentPage]);
 
   const fetchInstructors = async () => {
@@ -72,6 +87,57 @@ function InstructorsPage() {
       setLoading(false);
     }
   };
+
+  const handleApproveRequest = async (id) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await approveTrainerRequest(id);
+      toast.success('Request approved successfully!');
+      fetchRequests();
+    } catch (err) {
+      toast.error('Failed to approve trainer request.');
+      setError(err.message || "Failed to approve trainer request.");
+      console.error("Approve trainer request error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRejectRequest = async (id) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await rejectTrainerRequest(id);
+      toast.success('Request rejected successfully!');
+      fetchRequests();
+    } catch (err) {
+      toast.error('Failed to reject trainer request.');
+      setError(err.message || "Failed to reject trainer request.");
+      console.error("Reject trainer request error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchRequests = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await getAllTrainerRequests();
+      setRequests(result.trainerRequests);
+    } catch (err) {
+      setError(err.message || "Failed to fetch trainer requests.");
+      console.error("Fetch trainer requests error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (showRequests) {
+      fetchRequests();
+    }
+  }, [showRequests]);
 
   const handleDeleteInstructor = async () => {
     if (!deleteModal.id) return;
@@ -577,10 +643,15 @@ function InstructorsPage() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setShowRequests(true)}
-                    className="bg-yellow-500 text-white px-4 py-2 rounded-lg flex items-center"
+                    className="relative bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-2.5 rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 group"
                   >
-                    <FiAlertTriangle className="mr-2" />
-                    Requests
+                    <Bell className="w-5 h-5 group-hover:animate-swing" />
+                    <span>Requests</span>
+                    {requests.length > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md animate-pulse">
+                        {requests.length}
+                      </span>
+                    )}
                   </motion.button>
 
                   <motion.button
@@ -886,6 +957,126 @@ function InstructorsPage() {
         onClose={() => setEditModal({ isOpen: false, instructor: null })}
         instructor={editModal.instructor}
       />
+
+      <AnimatePresence>
+        {showRequests && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+              onClick={() => setShowRequests(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="fixed top-[10%] left-1/2 -translate-x-1/2 w-full max-w-2xl bg-white rounded-2xl shadow-2xl z-50 overflow-hidden"
+            >
+              <div className="p-6 border-b border-gray-100">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-gray-800">
+                    Trainer Requests
+                  </h2>
+                  <button
+                    onClick={() => setShowRequests(false)}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="max-h-[60vh] overflow-y-auto p-6 space-y-4">
+                {requests.length === 0 ? (
+                  <p className="text-gray-600">No pending requests.</p>
+                ) : (
+                  requests.map((request) => (
+                    <motion.div
+                      key={request.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-white rounded-xl border border-gray-100 p-6 hover:shadow-lg transition-shadow"
+                    >
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full overflow-hidden">
+                              <img
+                                src={request.image}
+                                alt={request.fullName}
+                                className="h-full w-full object-cover"
+                              />
+                            </div>
+                          <div>
+                            <h3 className="font-semibold text-gray-800">
+                              {request.fullName}
+                            </h3>
+                            <p className="text-sm text-gray-500">
+                              {request.experience} experience
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleApproveRequest(request._id)}
+                            className="bg-green-50 text-green-600 px-4 py-2 rounded-full text-sm font-medium hover:bg-green-100 transition-colors flex items-center gap-1"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                            Accept
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => handleRejectRequest(request._id)}
+                            className="bg-red-50 text-red-600 px-4 py-2 rounded-full text-sm font-medium hover:bg-red-100 transition-colors flex items-center gap-1"
+                          >
+                            <XCircle className="w-4 h-4" />
+                            Reject
+                          </motion.button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Mail className="w-4 h-4" />
+                          <span className="text-sm">{request.email}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Phone className="w-4 h-4" />
+                          <span className="text-sm">{request.phone}</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Award className="w-4 h-4 text-indigo-600" />
+                          <span className="text-sm font-medium text-gray-700">
+                            Specialties
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {request.specialties.map((specialty, index) => (
+                            <span
+                              key={index}
+                              className="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-sm"
+                            >
+                              {specialty}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

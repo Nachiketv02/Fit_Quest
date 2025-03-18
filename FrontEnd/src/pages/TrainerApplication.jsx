@@ -11,6 +11,8 @@ import {
   FiArrowLeft,
   FiBriefcase
 } from 'react-icons/fi';
+import {createTrainerRequest} from '../services/Admin/api';
+import { toast } from 'react-toastify';
 
 function TrainerApplication() {
   const navigate = useNavigate();
@@ -19,7 +21,7 @@ function TrainerApplication() {
     title: '',
     email: '',
     phone: '',
-    specialties: '',
+    specialties: [],
     image: '',
     experience: '',
     certifications: ''
@@ -33,16 +35,20 @@ function TrainerApplication() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Transform specialties string to array
+
     const transformedData = {
       ...formData,
       specialties: formData.specialties.split(',').map(s => s.trim())
     };
-    console.log('Form submitted:', transformedData);
-    alert('Application submitted successfully!');
-    navigate('/');
+    try {
+      await createTrainerRequest(transformedData);
+      toast.success('Application submitted successfully!');
+      navigate('/trainers');
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   return (

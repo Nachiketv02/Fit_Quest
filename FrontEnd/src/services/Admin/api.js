@@ -57,6 +57,50 @@ export const searchInstructors = async (q, page, limit) => {
   }
 };
 
+export const createTrainerRequest = async (trainerRequestData) => {
+  try {
+    const response = await api.post('/instructors/requests', trainerRequestData);
+    console.log('Trainer request response:', response.data);
+    return response.data.trainerRequest;
+  } catch (error) {
+    console.error('Error creating trainer request:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getAllTrainerRequests = async () => {
+  try {
+    const response = await api.get('/instructors/requests');
+    console.log('Trainer requests response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching trainer requests:', error);
+    throw error;
+  }
+};
+
+export const approveTrainerRequest = async (id) => {
+  try {
+    const response = await api.post(`/instructors/requests/${id}/approve`);
+    console.log('Approve trainer request response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error approving trainer request:', error);
+    throw error;
+  }
+};
+
+export const rejectTrainerRequest = async (id) => {
+  try {
+    const response = await api.post(`/instructors/requests/${id}/reject`);
+    console.log('Reject trainer request response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error rejecting trainer request:', error);
+    throw error;
+  }
+};
+
 //classes
 
 export const getAllInstructors = async () => {
@@ -125,7 +169,6 @@ export const deleteClass = async (id) => {
 export const getAllMembers = async () => {
   try {
     const response = await api.get('/members');
-    console.log('Members response:', response.data.data);
     if (response.status === 200) {
       return response.data.data;
     } else {

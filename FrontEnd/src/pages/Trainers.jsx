@@ -21,7 +21,7 @@ function Trainers() {
   const [searchQuery, setSearchQuery] = useState('');
   const [trainers, setTrainers] = useState([]);
   const navigate = useNavigate();
-  
+
   const filters = [
     { id: 'all', name: 'All Trainers' },
     { id: 'strength', name: 'Strength & Conditioning' },
@@ -34,7 +34,6 @@ function Trainers() {
   const fetchTrainers = async () => {
     try {
       const response = await getAllInstructors();
-      console.log('Trainers response:', response.instructors);
       setTrainers(response.instructors);
     } catch (error) {
       console.error('Error fetching trainers:', error);

@@ -30,7 +30,7 @@ router.delete("/instructors/:id", authMiddleware.isAuthenticated, authMiddleware
 
 router.get('/instructors/search', authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminInstructorsController.searchInstructors);
 
-router.post('/instructors/requests', authMiddleware.isAuthenticated, authMiddleware.isAdmin ,[
+router.post('/instructors/requests' ,[
     body("fullName").isLength({ min: 3 }).withMessage("Full Name must be at least 3 characters long"),
     body("email").isEmail().withMessage("Email must be a valid email"),
     body("phone").isLength({ min: 10 }).withMessage("Phone number must be at least 10 characters long"),
