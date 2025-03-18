@@ -21,7 +21,7 @@ export const getInstructors = async (page = 1, limit = 5) => {
 export const addInstructor = async (instructorData) => {
   try {
     const response = await api.post('/instructors', instructorData);
-    return response.data;
+    return response.data.instructor;
   } catch (error) {
     console.error('Error adding instructor:', error.response?.data || error.message);
     throw error;
@@ -31,7 +31,7 @@ export const addInstructor = async (instructorData) => {
 export const updateInstructor = async (id, instructorData) => {
   try {
     const response = await api.put(`/instructors/${id}`, instructorData);
-    return response.data;
+    return response.data.instructor;
   } catch (error) {
     console.error('Error updating instructor:', error);
     throw error;

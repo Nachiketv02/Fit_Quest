@@ -1,183 +1,62 @@
-import { useState } from 'react';
+import { useState ,useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiInstagram, FiLinkedin, FiTwitter, FiAward, FiUsers, FiClock } from 'react-icons/fi';
+import { 
+  FiInstagram, 
+  FiLinkedin, 
+  FiTwitter, 
+  FiAward, 
+  FiUsers, 
+  FiClock,
+  FiMail,
+  FiPhone,
+  FiActivity,
+  FiStar,
+  FiCalendar
+} from 'react-icons/fi';
+import { getAllInstructors } from '../services/Admin/api';
 
 function Trainers() {
   const [activeFilter, setActiveFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [trainers, setTrainers] = useState([]);
 
   const filters = [
     { id: 'all', name: 'All Trainers' },
     { id: 'strength', name: 'Strength & Conditioning' },
-    { id: 'cardio', name: 'Cardio & HIIT' },
-    { id: 'yoga', name: 'Yoga & Flexibility' },
-    { id: 'nutrition', name: 'Nutrition' },
+    { id: 'cardio', name: 'Cardio' },
+    { id: 'yoga & flexibility', name: 'Yoga & Flexibility' },
+    { id: 'hiit', name: 'HIIT' },
+    { id: 'dance', name: 'Dance' },
   ];
 
-  const trainers = [
-    {
-      id: 1,
-      name: 'Alex Rivera',
-      specialties: ['cardio', 'hiit'],
-      title: 'Cardio & HIIT Specialist',
-      bio: 'Former professional athlete with 10+ years of experience in high-intensity training. Alex specializes in cardio conditioning and HIIT workouts that maximize calorie burn and improve cardiovascular health.',
-      experience: '10+ years',
-      certifications: ['NASM Certified Personal Trainer', 'HIIT Specialist', 'TRX Certified'],
-      image: 'https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=400&h=500&fit=crop',
-      social: {
-        instagram: 'https://instagram.com',
-        twitter: 'https://twitter.com',
-        linkedin: 'https://linkedin.com'
-      },
-      schedule: ['Monday', 'Wednesday', 'Friday'],
-      rating: 4.9,
-      reviewCount: 127
-    },
-    {
-      id: 2,
-      name: 'Maya Johnson',
-      specialties: ['strength', 'nutrition'],
-      title: 'Strength Coach & Nutritionist',
-      bio: 'Maya combines strength training expertise with nutritional guidance to help clients achieve total body transformations. Her holistic approach focuses on sustainable lifestyle changes.',
-      experience: '8 years',
-      certifications: ['NSCA Strength & Conditioning Specialist', 'Precision Nutrition Level 2', 'Kettlebell Certification'],
-      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=500&fit=crop',
-      social: {
-        instagram: 'https://instagram.com',
-        twitter: 'https://twitter.com',
-        linkedin: 'https://linkedin.com'
-      },
-      schedule: ['Tuesday', 'Thursday', 'Saturday'],
-      rating: 4.8,
-      reviewCount: 93
-    },
-    {
-      id: 3,
-      name: 'Sophia Chen',
-      specialties: ['yoga', 'flexibility'],
-      title: 'Yoga & Mindfulness Coach',
-      bio: 'Sophia brings a decade of yoga practice and teaching to Fit Quest. Her classes focus on flexibility, balance, and mindfulness, helping clients reduce stress while improving physical strength.',
-      experience: '10 years',
-      certifications: ['500hr Registered Yoga Teacher', 'Meditation Instructor', 'Flexibility Specialist'],
-      image: 'https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=400&h=500&fit=crop',
-      social: {
-        instagram: 'https://instagram.com',
-        twitter: 'https://twitter.com',
-        linkedin: 'https://linkedin.com'
-      },
-      schedule: ['Monday', 'Wednesday', 'Friday', 'Sunday'],
-      rating: 4.9,
-      reviewCount: 156
-    },
-    {
-      id: 4,
-      name: 'James Wilson',
-      specialties: ['strength', 'cardio'],
-      title: 'Performance Coach',
-      bio: 'With a background in competitive sports, James specializes in performance enhancement for athletes and fitness enthusiasts. His training combines strength, power, and conditioning elements.',
-      experience: '12 years',
-      certifications: ['CSCS Certified Strength & Conditioning Specialist', 'Performance Enhancement Specialist', 'Olympic Weightlifting Coach'],
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=500&fit=crop',
-      social: {
-        instagram: 'https://instagram.com',
-        twitter: 'https://twitter.com',
-        linkedin: 'https://linkedin.com'
-      },
-      schedule: ['Tuesday', 'Thursday', 'Saturday'],
-      rating: 4.7,
-      reviewCount: 88
-    },
-    {
-      id: 5,
-      name: 'Elena Rodriguez',
-      specialties: ['cardio', 'dance'],
-      title: 'Dance Fitness Instructor',
-      bio: 'Elena brings energy and fun to every session with her background in professional dance. Her classes combine cardio, rhythm, and dance elements for an effective and enjoyable workout experience.',
-      experience: '7 years',
-      certifications: ['Zumba Certified Instructor', 'AFAA Group Fitness Instructor', 'Dance Fitness Specialist'],
-      image: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=400&h=500&fit=crop',
-      social: {
-        instagram: 'https://instagram.com',
-        twitter: 'https://twitter.com',
-        linkedin: 'https://linkedin.com'
-      },
-      schedule: ['Monday', 'Wednesday', 'Saturday'],
-      rating: 4.9,
-      reviewCount: 112
-    },
-    {
-      id: 6,
-      name: 'David Kim',
-      specialties: ['strength', 'nutrition'],
-      title: 'Body Transformation Specialist',
-      bio: 'David specializes in complete body transformations through a combination of strategic strength training and personalized nutrition planning. His data-driven approach delivers consistent results.',
-      experience: '9 years',
-      certifications: ['NASM Certified Personal Trainer', 'Precision Nutrition Coach', 'Transformation Specialist'],
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=500&fit=crop',
-      social: {
-        instagram: 'https://instagram.com',
-        twitter: 'https://twitter.com',
-        linkedin: 'https://linkedin.com'
-      },
-      schedule: ['Tuesday', 'Thursday', 'Friday'],
-      rating: 4.8,
-      reviewCount: 76
-    },
-    {
-      id: 7,
-      name: 'Olivia Martinez',
-      specialties: ['yoga', 'pilates'],
-      title: 'Pilates & Core Specialist',
-      bio: 'Olivia is an expert in Pilates and core conditioning. Her training focuses on building a strong foundation through proper alignment, breathing techniques, and controlled movements.',
-      experience: '8 years',
-      certifications: ['Comprehensive Pilates Certification', 'Core Specialist', 'Corrective Exercise Specialist'],
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop',
-      social: {
-        instagram: 'https://instagram.com',
-        twitter: 'https://twitter.com',
-        linkedin: 'https://linkedin.com'
-      },
-      schedule: ['Monday', 'Wednesday', 'Friday'],
-      rating: 4.9,
-      reviewCount: 104
-    },
-    {
-      id: 8,
-      name: 'Michael Lee',
-      specialties: ['cardio', 'martial-arts'],
-      title: 'Martial Arts & Fitness Coach',
-      bio: 'With a black belt in multiple martial arts disciplines, Michael combines combat sports with fitness training for a unique and effective workout experience that builds strength, agility, and confidence.',
-      experience: '15 years',
-      certifications: ['Multiple Black Belts', 'Kickboxing Instructor', 'Functional Training Specialist'],
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop',
-      social: {
-        instagram: 'https://instagram.com',
-        twitter: 'https://twitter.com',
-        linkedin: 'https://linkedin.com'
-      },
-      schedule: ['Tuesday', 'Thursday', 'Saturday'],
-      rating: 4.8,
-      reviewCount: 91
+  const fetchTrainers = async () => {
+    try {
+      const response = await getAllInstructors();
+      console.log('Trainers response:', response.instructors);
+      setTrainers(response.instructors);
+    } catch (error) {
+      console.error('Error fetching trainers:', error);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchTrainers();
+  }, []); 
 
   const filteredTrainers = activeFilter === 'all' 
     ? trainers 
-    : trainers.filter(trainer => trainer.specialties.includes(activeFilter));
+    : trainers.filter(trainer => trainer.title.toLowerCase().includes(activeFilter));
 
-  const fadeIn = {
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.6 }
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value.toLowerCase());
   };
 
-  const staggerContainer = {
-    initial: {},
-    animate: {
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
+  const searchedTrainers = filteredTrainers.filter(trainer => 
+    trainer.fullName.toLowerCase().includes(searchQuery) ||
+    trainer.specialties.some(specialty => specialty.toLowerCase().includes(searchQuery)) ||
+    trainer.email.toLowerCase().includes(searchQuery) ||
+    trainer.phone.toLowerCase().includes(searchQuery)
+  );
 
   return (
     <div className="pt-20 bg-gray-50">
@@ -202,138 +81,182 @@ function Trainers() {
       {/* Trainers Section */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Filters */}
-          <motion.div 
-            className="flex flex-wrap justify-center gap-3 mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {filters.map(filter => (
-              <button
-                key={filter.id}
-                onClick={() => setActiveFilter(filter.id)}
-                className={`px-6 py-2 rounded-full transition-all duration-300 ${
-                  activeFilter === filter.id 
-                    ? 'bg-primary text-white shadow-md' 
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                {filter.name}
-              </button>
-            ))}
-          </motion.div>
-
-          {/* Trainers Grid */}
-          <motion.div 
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-            variants={staggerContainer}
-            initial="initial"
-            animate="animate"
-          >
-            {filteredTrainers.map(trainer => (
-              <motion.div
-              key={trainer.id}
-              className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow flex flex-col" // Add flex and flex-col here
-              variants={{
-                initial: { opacity: 0, y: 20 },
-                animate: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-              }}
-            >
-              <div className="h-80 overflow-hidden relative">
-                <img 
-                  src={trainer.image} 
-                  alt={trainer.name} 
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
-                  <div className="flex items-center">
-                    <div className="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium mr-2">
-                      {trainer.rating}★
-                    </div>
-                    <span className="text-white text-sm">({trainer.reviewCount} reviews)</span>
-                  </div>
+          {/* Search and Filters */}
+          <div className="mb-12">
+            <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    placeholder="Search trainers..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    onChange={handleSearchChange}
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {filters.map(filter => (
+                    <button
+                      key={filter.id}
+                      onClick={() => setActiveFilter(filter.id)}
+                      className={`px-4 py-2 rounded-lg transition-colors ${
+                        activeFilter === filter.id 
+                          ? 'bg-primary text-white' 
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {filter.name}
+                    </button>
+                  ))}
                 </div>
               </div>
-              
-              <div className="p-6 flex flex-col flex-grow"> {/* Add flex, flex-col, and flex-grow here */}
-                <h3 className="text-xl font-bold mb-1">{trainer.name}</h3>
-                <p className="text-primary font-medium mb-3">{trainer.title}</p>
-                
-                <p className="text-gray-600 mb-4 line-clamp-2">{trainer.bio}</p>
-                
-                <div className="flex flex-wrap gap-3 mb-4">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <FiAward className="mr-1" />
-                    {trainer.experience}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <FiUsers className="mr-1" />
-                    {trainer.certifications.length} Certifications
-                  </div>
+            </div>
+          </div>
+
+          {/* Trainers Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {searchedTrainers.map((trainer, index) => (
+              <motion.div
+                key={trainer._id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white rounded-xl shadow-md overflow-hidden"
+              >
+                {/* Trainer Image */}
+                <div className="h-64 relative overflow-hidden">
+                  <img 
+                    src={trainer.image} 
+                    alt={trainer.fullName}
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                  />
+                  {/* <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center">
+                    <FiStar className="text-yellow-400 mr-1" />
+                    <span className="font-medium">{trainer.rating}</span>
+                    <span className="text-sm text-gray-600 ml-1">({trainer.reviewCount})</span>
+                  </div> */}
                 </div>
-                
-                <div className="border-t pt-4 mb-4">
-                  <h4 className="font-medium mb-2 flex items-center">
-                    <FiClock className="mr-2" />
-                    Available Days
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {trainer.schedule.map((day, index) => (
-                      <span key={index} className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">
-                        {day}
+
+                {/* Trainer Info */}
+                <div className="p-6">
+                  <div className="mb-4">
+                    <h3 className="text-xl font-bold mb-1">{trainer.fullName}</h3>
+                    <p className="text-primary font-medium">{trainer.title}</p>
+                  </div>
+
+                  {/* Contact Info */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <FiMail className="mr-2" />
+                      {trainer.email}
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <FiPhone className="mr-2" />
+                      {trainer.phone}
+                    </div>
+                  </div>
+
+                  {/* Specialties */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {trainer.specialties.map((specialty, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
+                      >
+                        <FiActivity className="mr-1" />
+                        {specialty}
                       </span>
                     ))}
                   </div>
-                </div>
-                
-                <div className="mt-auto flex justify-between items-center"> {/* Add mt-auto here */}
-                  <div className="flex space-x-3">
-                    <motion.a
-                      whileHover={{ scale: 1.2 }}
-                      href={trainer.social.instagram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-500 hover:text-primary transition-colors"
-                    >
-                      <FiInstagram size={18} />
-                    </motion.a>
-                    <motion.a
-                      whileHover={{ scale: 1.2 }}
-                      href={trainer.social.twitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-500 hover:text-primary transition-colors"
-                    >
-                      <FiTwitter size={18} />
-                    </motion.a>
-                    <motion.a
-                      whileHover={{ scale: 1.2 }}
-                      href={trainer.social.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-500 hover:text-primary transition-colors"
-                    >
-                      <FiLinkedin size={18} />
-                    </motion.a>
+
+                  {/* Experience & Certifications */}
+                  <div className="flex flex-wrap gap-4 mb-4">
+                    <div className="flex items-center text-sm text-gray-600">
+                      <FiAward className="mr-1" />
+                      {/* {trainer.experience} */}
+                      8 Year
+                    </div>
+                    <div className="flex items-center text-sm text-gray-600">
+                      <FiUsers className="mr-1" />
+                      {/* {trainer.certifications.length} Certifications */}
+                      3 Certifications
+                    </div>
                   </div>
-                  
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
-                  >
-                    Book Session
-                  </motion.button>
+
+                  {/* Classes */}
+                  <div className="border-t border-gray-200 pt-4 mb-4">
+                    <h4 className="font-medium mb-2 flex items-center">
+                      <FiCalendar className="mr-2" />
+                      Available Classes
+                    </h4>
+                    {/* <div className="space-y-2">
+                      {trainer.classes.map((classItem, index) => (
+                        <div key={index} className="flex justify-between text-sm">
+                          <span className="text-gray-700">{classItem.name}</span>
+                          <span className="text-gray-500">{classItem.time} ({classItem.days})</span>
+                        </div>
+                      ))}
+                    </div> */}
+                  </div>
+
+                  {/* Next Available */}
+                  <div className="flex items-center justify-between mb-6">
+                    {/* <div className="flex items-center text-sm text-gray-600">
+                      <FiClock className="mr-2" />
+                      Next Available:
+                    </div> */}
+                    <span className="text-sm font-medium text-primary">
+                      {trainer.nextAvailable}
+                    </span>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex space-x-3">
+                      <motion.a
+                        whileHover={{ scale: 1.2 }}
+                        href="https://instagram.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-500 hover:text-primary transition-colors"
+                      >
+                        <FiInstagram size={18} />
+                      </motion.a>
+                      <motion.a
+                        whileHover={{ scale: 1.2 }}
+                        href="https://twitter.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-500 hover:text-primary transition-colors"
+                      >
+                        <FiTwitter size={18} />
+                      </motion.a>
+                      <motion.a
+                        whileHover={{ scale: 1.2 }}
+                        href="https://linkedin.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-500 hover:text-primary transition-colors"
+                      >
+                        <FiLinkedin size={18} />
+                      </motion.a>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+                    >
+                      Book Session
+                    </motion.button>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
             ))}
-          </motion.div>
-          
-          {filteredTrainers.length === 0 && (
+          </div>
+
+          {searchedTrainers.length === 0 && (
             <div className="text-center py-20">
-              <p className="text-gray-500 text-lg">No trainers found in this category.</p>
+              <p className="text-gray-500 text-lg">No trainers found matching your criteria.</p>
             </div>
           )}
         </div>

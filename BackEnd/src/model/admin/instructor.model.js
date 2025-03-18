@@ -7,6 +7,11 @@ const instructorSchema = new mongoose.Schema({
         minLength : [3, "Minimum length is 3"],
         maxLength : [50, "Maximum length is 50"]
     },
+    title : {
+        type : String,
+        required : true,
+        enum : ["strength", "cardio", "yoga & flexibility", "hiit", "dance", "nutrition"]
+    },
     email : {
         type : String,
         required : true,
@@ -29,6 +34,12 @@ const instructorSchema = new mongoose.Schema({
         type : String,
         enum : ["active", "inactive"],
         default : "active"
+    },
+    experience : {
+        type : String
+    },
+    certifications : {
+        type : String
     },
     createdAt : {
         type : Date,

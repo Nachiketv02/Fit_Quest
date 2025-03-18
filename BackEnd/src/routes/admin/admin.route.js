@@ -16,9 +16,9 @@ router.post("/instructors", authMiddleware.isAuthenticated, authMiddleware.isAdm
     body("image").isURL().withMessage("Image must be a valid URL")
 ] , adminInstructorsController.createInstructor);
 
-router.get("/instructors", authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminInstructorsController.getAllInstructors);
+router.get("/instructors",authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminInstructorsController.getAllInstructors);
 
-router.put("/instructors/:id", authMiddleware.isAuthenticated, authMiddleware.isAdmin ,[
+router.put("/instructors/:id",authMiddleware.isAuthenticated, authMiddleware.isAdmin ,[
     body("fullName").isLength({ min: 3 }).withMessage("Full Name must be at least 3 characters long"),
     body("email").isEmail().withMessage("Email must be a valid email"),
     body("phone").isLength({ min: 10 }).withMessage("Phone number must be at least 10 characters long"),
@@ -58,7 +58,7 @@ router.put('/classes/:id',authMiddleware.isAuthenticated, authMiddleware.isAdmin
 
 router.delete('/classes/:id',authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminClassesController.deleteClass);
 
-router.get('/instructors/all', authMiddleware.isAuthenticated, authMiddleware.isAdmin ,adminInstructorsController.getAllInstructorss);
+router.get('/instructors/all',adminInstructorsController.getAllInstructorss);
 
 //members
 

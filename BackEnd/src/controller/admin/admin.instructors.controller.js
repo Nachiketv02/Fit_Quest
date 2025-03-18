@@ -9,28 +9,27 @@ module.exports.createInstructor = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { fullName, email, phone, specialties, image } = req.body;
+    const { fullName, email, phone, specialties, image, title, experience, certifications } = req.body;
 
-    if (!fullName || !email || !phone || !specialties || !image) {
-      return res.status(400).json({ error: "All fields are required" });
-    }
-
-    const existingInstructor = await instructorModel.findOne({ email });
-    if (existingInstructor) {
-      return res.status(400).json({ error: "Instructor already exists" });
-    }
-
+    // Call the service function
     const instructor = await instructorService.createInstructor({
       fullName,
       email,
       phone,
       specialties,
       image,
+      title,
+      experience,
+      certifications,
     });
 
-    return res
-      .status(201)
-      .json({ message: "Instructor created successfully", instructor });
+    // Check if the instructor was created successfully
+    if (!instructor || !instructor._id) {
+      return res.status(500).json({ error: "Failed to create instructor" });
+    }
+
+    // Return success response
+    return res.status(201).json({ message: "Instructor created successfully", instructor });
   } catch (error) {
     console.log("Error in createInstructor Controller:", error.message);
     return res.status(500).json({ error: error.message });
@@ -75,19 +74,26 @@ module.exports.updateInstructor = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { fullName, email, phone, specialties, image } = req.body;
+    const { fullName, email, phone, specialties, image, title, experience, certifications } = req.body;
 
-    if (!fullName || !email || !phone || !specialties || !image) {
+    if (!fullName || !email || !phone || !specialties || !image || !title || !experience || !certifications) {
       return res.status(400).json({ error: "All fields are required" });
     }
 
     const instructor = await instructorModel.findByIdAndUpdate(req.params.id, {
       fullName,
+      title,
       email,
       phone,
       specialties: Array.isArray(specialties) ? specialties : [specialties],
       image,
-    });
+      experience,
+      certifications
+    }, { new: true });
+
+    if (!instructor) {
+      return res.status(404).json({ error: "Instructor not found" });
+    }
 
     return res
       .status(200)

@@ -22,6 +22,8 @@ import {
   searchInstructors
 } from "../../services/Admin/api";
 import debounce from 'lodash/debounce';
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function InstructorsPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -82,39 +84,54 @@ function InstructorsPage() {
   const InstructorModal = ({ isOpen, onClose }) => {
     const [formData, setFormData] = useState({
       fullName: "",
+      title: "",
       email: "",
       phone: "",
       specialties: [],
       image: "",
+      experience: "",
+      certifications: "",
     });
-
-    const handleAddInstructor = async () => {
+  
+    const handleAddInstructor = async (e) => {
+      e.preventDefault();
       const newInstructor = {
         fullName: formData.fullName,
+        title: formData.title,
         email: formData.email,
         phone: formData.phone,
         specialties: formData.specialties.split(",").map((s) => s.trim()),
         image: formData.image,
+        experience: formData.experience,
+        certifications: formData.certifications,
       };
-
+  
       try {
         const data = await addInstructor(newInstructor);
-        setInstructors([...instructors, data]);
-        setFormData({
-          fullName: "",
-          email: "",
-          phone: "",
-          specialties: "",
-          image: "",
-        });
-        onClose();
+        if (data && data._id) {
+          setInstructors((prevInstructors) => [...prevInstructors, data]);
+          setFormData({
+            fullName: "",
+            title: "",
+            email: "",
+            phone: "",
+            specialties: [],
+            image: "",
+            experience: "",
+            certifications: "",
+          });
+          onClose();
+          toast.success("Instructor added successfully");
+        } else {
+          console.error("Invalid data format received from API");
+        }
       } catch (error) {
-        console.log(error.m);
+        console.log(error.message);
       }
     };
-
+  
     if (!isOpen) return null;
-
+  
     return (
       <>
         <div
@@ -125,99 +142,152 @@ function InstructorsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
-          className="fixed inset-x-0 top-[10%] mx-auto max-w-2xl bg-white rounded-lg shadow-xl z-50 p-6"
+          className="fixed inset-x-0 top-[10%] mx-auto max-w-2xl bg-white rounded-xl shadow-2xl z-50 p-8"
         >
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">
             Add New Instructor
           </h2>
-
-          <form className="space-y-4" onSubmit={handleAddInstructor}>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <input
-                type="text"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                placeholder="Enter instructor's full name"
-                value={formData.fullName}
-                onChange={(e) =>
-                  setFormData({ ...formData, fullName: e.target.value })
-                }
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                placeholder="Enter email address"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                placeholder="Enter phone number"
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-              />
-            </div>
-
-            <div>
+  
+          <form className="space-y-6" onSubmit={handleAddInstructor}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="Shraddha Maheshwari"
+                  value={formData.fullName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, fullName: e.target.value })
+                  }
+                />
+              </div>
+  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Title
+                </label>
+                <select
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                >
+                  <option value="" disabled>Select Title</option>
+                  <option value="strength">Strength & Conditioning</option>
+                  <option value="cardio">Cardio</option>
+                  <option value="yoga & flexibility">Yoga & Flexibility</option>
+                  <option value="hiit">HIIT</option>
+                  <option value="dance">Dance</option>
+                  <option value="nutrition">Nutrition</option>
+                </select>
+              </div>
+  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="shradha.maheshwari@example.com"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                />
+              </div>
+  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="+91 9645873214"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                />
+              </div>
+  
+              <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Specialties
               </label>
               <input
                 type="text"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                placeholder="Enter specialties (comma separated)"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                placeholder="Yoga, Cardio, Nutrition"
                 value={formData.specialties}
                 onChange={(e) =>
                   setFormData({ ...formData, specialties: e.target.value })
                 }
               />
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Profile Image URL
-              </label>
-              <input
-                type="url"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                placeholder="Enter profile image URL"
-                value={formData.image}
-                onChange={(e) =>
-                  setFormData({ ...formData, image: e.target.value })
-                }
-              />
+  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Profile Image URL
+                </label>
+                <input
+                  type="url"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="https://example.com/image.jpg"
+                  value={formData.image}
+                  onChange={(e) =>
+                    setFormData({ ...formData, image: e.target.value })
+                  }
+                />
+              </div>
+  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Experience
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="5 years of experience"
+                  value={formData.experience}
+                  onChange={(e) =>
+                    setFormData({ ...formData, experience: e.target.value })
+                  }
+                />
+              </div>
+  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Number of Certifications
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="2"
+                  value={formData.certifications}
+                  onChange={(e) =>
+                    setFormData({ ...formData, certifications: e.target.value })
+                  }
+                />
+              </div>
             </div>
-
-            <div className="flex justify-end space-x-3 mt-6">
+  
+            <div className="flex justify-end space-x-4 mt-8">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                className="px-6 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-white bg-primary rounded-lg hover:bg-primary/90"
+                className="px-6 py-3 text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors"
               >
                 Add Instructor
               </button>
@@ -231,51 +301,62 @@ function InstructorsPage() {
   const EditInstructorModal = ({ isOpen, onClose, instructor }) => {
     const [formData, setFormData] = useState({
       fullName: "",
+      title: "",
       email: "",
       phone: "",
-      specialties: "",
+      specialties: [],
       image: "",
+      experience: "",
+      certifications: "",
     });
   
     useEffect(() => {
       if (instructor) {
         setFormData({
           fullName: instructor.fullName,
+          title: instructor.title,
           email: instructor.email,
           phone: instructor.phone,
           specialties: instructor.specialties.join(", "),
           image: instructor.image,
+          experience: instructor.experience,
+          certifications: instructor.certifications,
         });
       }
     }, [instructor]);
   
-    const handleEditInstructor = async () => {
+    const handleEditInstructor = async (e) => {
+      e.preventDefault(); 
       const updatedInstructor = {
         fullName: formData.fullName,
+        title: formData.title,
         email: formData.email,
         phone: formData.phone,
         specialties: formData.specialties.split(",").map((s) => s.trim()),
         image: formData.image,
+        experience: formData.experience,
+        certifications: formData.certifications,
       };
   
       try {
         const data = await updateInstructor(instructor._id, updatedInstructor);
-        setInstructors(instructors.map(inst => inst._id === instructor._id ? data : inst));
-        setFormData({
-          fullName: "",
-          email: "",
-          phone: "",
-          specialties: "",
-          image: "",
-        });
-        onClose();
+  
+        if (data && data._id) {
+          setInstructors((prevInstructors) =>
+            prevInstructors.map((inst) => (inst._id === instructor._id ? data : inst))
+          );
+          toast.success("Instructor updated successfully");
+          onClose();
+        } else {
+          console.error("Invalid data format received from API");
+        }
       } catch (error) {
-        console.log(error);
+        console.error("Error updating instructor:", error);
       }
     };
   
     if (!isOpen) return null;
-
+  
     return (
       <>
         <div
@@ -286,99 +367,152 @@ function InstructorsPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
-          className="fixed inset-x-0 top-[10%] mx-auto max-w-2xl bg-white rounded-lg shadow-xl z-50 p-6"
+          className="fixed inset-x-0 top-[10%] mx-auto max-w-2xl bg-white rounded-xl shadow-2xl z-50 p-8"
         >
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6">
             Edit Instructor
           </h2>
   
-          <form className="space-y-4" onSubmit={handleEditInstructor}>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <input
-                type="text"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                placeholder="Enter instructor's full name"
-                value={formData.fullName}
-                onChange={(e) =>
-                  setFormData({ ...formData, fullName: e.target.value })
-                }
-              />
+          <form className="space-y-6" onSubmit={handleEditInstructor}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="Shraddha Maheshwari"
+                  value={formData.fullName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, fullName: e.target.value })
+                  }
+                />
+              </div>
+  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Title
+                </label>
+                <select
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                >
+                  <option value="" disabled>Select Title</option>
+                  <option value="strength">Strength & Conditioning</option>
+                  <option value="cardio">Cardio</option>
+                  <option value="yoga & flexibility">Yoga & Flexibility</option>
+                  <option value="hiit">HIIT</option>
+                  <option value="dance">Dance</option>
+                  <option value="nutrition">Nutrition</option>
+                </select>
+              </div>
+  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="shradha.maheshwari@example.com"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                />
+              </div>
+  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="+91 9645873214"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                />
+              </div>
+  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Specialties
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="Yoga, Cardio, Nutrition"
+                  value={formData.specialties}
+                  onChange={(e) =>
+                    setFormData({ ...formData, specialties: e.target.value })
+                  }
+                />
+              </div>
+  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Profile Image URL
+                </label>
+                <input
+                  type="url"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="https://example.com/image.jpg"
+                  value={formData.image}
+                  onChange={(e) =>
+                    setFormData({ ...formData, image: e.target.value })
+                  }
+                />
+              </div>
+  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Experience
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="5 years of experience"
+                  value={formData.experience}
+                  onChange={(e) =>
+                    setFormData({ ...formData, experience: e.target.value })
+                  }
+                />
+              </div>
+  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Number of Certifications
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  placeholder="2"
+                  value={formData.certifications}
+                  onChange={(e) =>
+                    setFormData({ ...formData, certifications: e.target.value })
+                  }
+                />
+              </div>
             </div>
   
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                placeholder="Enter email address"
-                value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-              />
-            </div>
-  
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                placeholder="Enter phone number"
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
-              />
-            </div>
-  
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Specialties
-              </label>
-              <input
-                type="text"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                placeholder="Enter specialties (comma separated)"
-                value={formData.specialties}
-                onChange={(e) =>
-                  setFormData({ ...formData, specialties: e.target.value })
-                }
-              />
-            </div>
-  
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Profile Image URL
-              </label>
-              <input
-                type="url"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                placeholder="Enter profile image URL"
-                value={formData.image}
-                onChange={(e) =>
-                  setFormData({ ...formData, image: e.target.value })
-                }
-              />
-            </div>
-  
-            <div className="flex justify-end space-x-3 mt-6">
+            <div className="flex justify-end space-x-4 mt-8">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                className="px-6 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 text-white bg-primary rounded-lg hover:bg-primary/90"
+                className="px-6 py-3 text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors"
               >
                 Update Instructor
               </button>
