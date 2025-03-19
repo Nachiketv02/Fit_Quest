@@ -45,7 +45,7 @@ function Login() {
           }
         }, 2000);
       } else {
-        toast.error(response.data.message, { position: "top-right" });
+        toast.error(error.response?.data.error || "Login failed! Please try again.", { position: "top-right" });
       }
       setFormData({
         email: "",
@@ -53,7 +53,7 @@ function Login() {
       });
     } catch (error) {
       console.error("Login Error:", error);
-      toast.error("Login failed! Please try again.", { position: "top-right" });
+      toast.error(error.response?.data.error || "Login failed! Please try again.", { position: "top-right" });
     }
   };
 

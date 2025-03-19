@@ -320,7 +320,7 @@ module.exports.loginUser = async (req, res) => {
 
     const user = await userModel.findOne({ email, isVerified: true });
     if (!user) {
-      return res.status(400).json({ error: "User not found" });
+      return res.status(400).json({ error: "User not found. Please verify your account or register your account." });
     }
 
     const isPasswordValid = await user.comparePassword(password);

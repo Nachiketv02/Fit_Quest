@@ -60,7 +60,6 @@ export const searchInstructors = async (q, page, limit) => {
 export const createTrainerRequest = async (trainerRequestData) => {
   try {
     const response = await api.post('/instructors/requests', trainerRequestData);
-    console.log('Trainer request response:', response.data);
     return response.data.trainerRequest;
   } catch (error) {
     console.error('Error creating trainer request:', error.response?.data || error.message);
@@ -71,10 +70,9 @@ export const createTrainerRequest = async (trainerRequestData) => {
 export const getAllTrainerRequests = async () => {
   try {
     const response = await api.get('/instructors/requests');
-    console.log('Trainer requests response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error fetching trainer requests:', error);
+    console.error('Error fetching trainer requests:', error.response?.data || error.message);
     throw error;
   }
 };
@@ -82,10 +80,9 @@ export const getAllTrainerRequests = async () => {
 export const approveTrainerRequest = async (id) => {
   try {
     const response = await api.post(`/instructors/requests/${id}/approve`);
-    console.log('Approve trainer request response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error approving trainer request:', error);
+    console.error('Error approving trainer request:', error.response?.data || error.message);
     throw error;
   }
 };
@@ -93,10 +90,9 @@ export const approveTrainerRequest = async (id) => {
 export const rejectTrainerRequest = async (id) => {
   try {
     const response = await api.post(`/instructors/requests/${id}/reject`);
-    console.log('Reject trainer request response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error rejecting trainer request:', error);
+    console.error('Error rejecting trainer request:', error.response?.data || error.message);
     throw error;
   }
 };
@@ -122,7 +118,7 @@ export const getClasses = async () => {
       throw new Error('Failed to fetch classes');
     }
   } catch(error){
-    console.log('Error fetching classes:', error);
+    console.error('Error fetching classes:', error.response?.data || error.message);
     throw error;
   }
 };
@@ -175,7 +171,7 @@ export const getAllMembers = async () => {
       throw new Error('Failed to fetch members');
     }
   } catch (error) {
-    console.error('Error fetching members:', error);
+    console.error('Error fetching members:', error.response?.data || error.message);
     throw error;
   }
 };

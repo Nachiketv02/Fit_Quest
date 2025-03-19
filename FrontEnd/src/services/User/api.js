@@ -13,7 +13,7 @@ export const updateSubscription = async (data) => {
     const response = await api.put('/subscription', data);
     return response.data;
   } catch (error) {
-    console.error('Error updating subscription:', error);
+    console.error('Error updating subscription:', error.response?.data.error || error.message);
     throw error;
   }
 };

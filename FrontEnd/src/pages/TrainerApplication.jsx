@@ -49,7 +49,7 @@ function TrainerApplication() {
       toast.success('Application submitted successfully!');
       navigate('/trainers');
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data.error || error.message);
     }
   };
 

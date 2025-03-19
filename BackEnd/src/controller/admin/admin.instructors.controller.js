@@ -1,6 +1,7 @@
 const instructorService = require("../../service/admin/instructors.service");
 const instructorModel = require("../../model/admin/instructor.model");
 const trainerRequestModel = require("../../model/admin/trainerRequest.model");
+const userModel = require("../../model/user.model");
 const { validationResult } = require("express-validator");
 
 module.exports.createInstructor = async (req, res) => {
@@ -171,6 +172,21 @@ module.exports.createTrainerRequest = async (req, res) => {
 
     const { fullName, title, email, phone, specialties, image, experience, certifications } = req.body;
 
+    const alreadyRequested = await trainerRequestModel.findOne({ email });
+    if (alreadyRequested) {
+      return res.status(400).json({ error: "You have already requested" });
+    }
+
+    const existingUser = await userModel.findOne({ email , isSubscribed: true });
+    if (existingUser) {
+      return res.status(400).json({ error: "You are already subscribed! for apply kindly contact authorized person" });
+    }
+    
+    const existingInstructor = await instructorModel.findOne({ email });
+    if (existingInstructor) {
+      return res.status(400).json({ error: "Instructor already exists" });
+    }
+
     const trainerRequest = await trainerRequestModel.create({
       fullName,
       title,
@@ -205,7 +221,7 @@ module.exports.approveTrainerRequest = async (req, res) => {
     if (!trainerRequest) {
       return res.status(404).json({ error: "Trainer request not found" });
     }
-    
+
     const newInstructors = await instructorService.createInstructor({
       fullName: trainerRequest.fullName,
       email: trainerRequest.email,
