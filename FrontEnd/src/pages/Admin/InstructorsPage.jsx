@@ -646,7 +646,7 @@ function InstructorsPage() {
                     className="relative bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-2.5 rounded-full font-medium shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 group"
                   >
                     <Bell className="w-5 h-5 group-hover:animate-swing" />
-                    <span>Requests</span>
+                    {/* <span>Requests</span> */}
                     {requests.length > 0 && (
                       <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center border-2 border-white shadow-md animate-pulse">
                         {requests.length}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -13,14 +13,16 @@ import {
 } from 'react-icons/fi';
 import {createTrainerRequest} from '../services/Admin/api';
 import { toast } from 'react-toastify';
+import { UserDataContext } from "../context/UserContext";
 
 function TrainerApplication() {
   const navigate = useNavigate();
+  const { userData } = useContext(UserDataContext);
   const [formData, setFormData] = useState({
-    fullName: '',
+    fullName: userData.fullName,
     title: '',
-    email: '',
-    phone: '',
+    email: userData.email,
+    phone: userData.phone,
     specialties: [],
     image: '',
     experience: '',
@@ -98,6 +100,7 @@ function TrainerApplication() {
                       onChange={handleInputChange}
                       className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                       placeholder="Shraddha Maheshwari"
+                      disabled
                     />
                   </div>
                 </div>
@@ -136,6 +139,7 @@ function TrainerApplication() {
                       onChange={handleInputChange}
                       className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                       placeholder="shradha.maheshwari@example.com"
+                      disabled
                     />
                   </div>
                 </div>
@@ -152,6 +156,7 @@ function TrainerApplication() {
                       onChange={handleInputChange}
                       className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                       placeholder="+91 9645873214"
+                      disabled
                     />
                   </div>
                 </div>
