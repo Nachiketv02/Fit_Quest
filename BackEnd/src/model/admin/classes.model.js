@@ -17,7 +17,7 @@ const classSchema = new mongoose.Schema({
         ref : "instructor"
     },
     startDate : {
-        type : Date,
+        type : String,
         required : true
     },
     times : {

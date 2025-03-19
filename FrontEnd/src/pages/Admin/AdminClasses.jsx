@@ -40,7 +40,7 @@ function AdminClasses() {
   const [classToEdit, setClassToEdit] = useState(null);
   const [newClass, setNewClass] = useState({
     name: "",
-    category: "cardio",
+    category: "",
     instructor: "",
     startDate: null,
     time: "",
@@ -133,15 +133,14 @@ function AdminClasses() {
   };
 
   const handleAddClass = async (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
     try {
       setLoading(true);
-      // Prepare the class data to be sent to the API
       const classData = {
         className: newClass.name,
         category: newClass.category,
-        instructor: newClass.instructor, // This should be the instructor's ID
-        startDate: newClass.startDate.toISOString().split("T")[0], // Ensure this is in the correct format
+        instructor: newClass.instructor,
+        startDate: newClass.startDate.toLocaleDateString('en-IN'),
         times: newClass.time,
         duration: newClass.duration,
         capacity: newClass.capacity,
@@ -149,17 +148,14 @@ function AdminClasses() {
         description: newClass.description,
       };
 
-      // Call the API to add the class
       const response = await addClass(classData);
 
-      // Update local state with the new class
-      setClassesData((prev) => [...prev, response.newClass]); // Assuming response contains the new class
+      setClassesData((prev) => [...prev, response.newClass]);
 
-      // Close the modal and reset the form
       setShowAddModal(false);
       setNewClass({
         name: "",
-        category: "cardio",
+        category: "",
         instructor: "",
         startDate: null,
         time: "",
@@ -169,36 +165,41 @@ function AdminClasses() {
         description: "",
       });
 
-      // Optionally show a success message
       toast.success("Class added successfully");
     } catch (error) {
-      setError(error.message); // Set the error state
-      console.error("Error adding class:", error); // Log the error
+      setError(error.message);
+      console.error("Error adding class:", error);
     } finally {
-      setLoading(false); // Reset loading state
+      setLoading(false);
     }
   };
 
   const handleEditClass = (classItem) => {
     if (!classItem) {
       console.error("classItem is undefined");
-      return; // Exit if classItem is undefined
+      return;
     }
-    console.log(classItem); // Log the classItem to see its structure
+  
+    // Parse DD/MM/YYYY safely
+    const [day, month, year] = classItem.startDate.split("/");
+    const parsedDate = new Date(`${year}-${month}-${day}`); // YYYY-MM-DD is safe for Date()
+  
     setClassToEdit({
       ...classItem,
       className: classItem.className,
-      startDate: new Date(classItem.startDate.split("T")[0]),
+      startDate: parsedDate,
       time: classItem.times,
     });
+  
     setShowEditModal(true);
   };
+  
   
   const handleUpdateClass = async (e) => {
     e.preventDefault();
     if (!classToEdit) {
       console.error("classToEdit is undefined");
-      return; // Exit if classToEdit is undefined
+      return;
     }
     try {
       setLoading(true);
@@ -206,7 +207,7 @@ function AdminClasses() {
         className: classToEdit.className,
         category: classToEdit.category,
         instructor: classToEdit.instructor,
-        startDate: classToEdit.startDate.toISOString().split("T")[0],
+        startDate: classToEdit.startDate.toLocaleDateString('en-IN'),
         times: classToEdit.time,
         duration: classToEdit.duration,
         capacity: classToEdit.capacity,
@@ -242,17 +243,15 @@ function AdminClasses() {
     return colors[category] || "bg-gray-500";
   };
 
-  //Date formate
-  const convertDateFormat = (date) => {
-    const [year, month, day] = date.split("-");
-    return `${day}-${month}-${year}`;
-  };
-
   //get day name
   const getDayName = (dateString) => {
-    const date = new Date(dateString);
+    const [day, month, year] = dateString.split('/');
+    const date = new Date(`${year}-${month}-${day}`);
+    if (isNaN(date.getTime())) {
+      throw new Error("Invalid date format. Expected format: DD/MM/YYYY");
+    }
     const options = { weekday: "long" };
-    return date.toLocaleDateString("en-US", options);
+    return date.toLocaleDateString("en-IN", options);
   };
 
   // Get category text color
@@ -398,10 +397,11 @@ function AdminClasses() {
                           </div>
                           <div className="text-xs text-gray-500 mt-1 flex items-center">
                             <FiCalendar className="mr-1 text-gray-400" />
-                            {convertDateFormat(
+                            {/* {convertDateFormat(
                               classItem.startDate.split("T")[0]
                             )}{" "}
-                            - {getDayName(classItem.startDate.split("T")[0])}
+                            - {getDayName(classItem.startDate.split("T")[0])} */}
+                            {classItem.startDate}-{getDayName(classItem.startDate)}
                           </div>
                           <div className="text-xs text-gray-500 mt-1 flex items-center">
                             <FiMapPin className="mr-1 text-gray-400" />
@@ -667,6 +667,9 @@ function AdminClasses() {
                   }
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 >
+                  <option value="" disabled>
+                    Select Category
+                  </option>
                   <option value="cardio">Cardio</option>
                   <option value="strength">Strength</option>
                   <option value="yoga & flexibility">Yoga & flexibility</option>
@@ -717,6 +720,7 @@ function AdminClasses() {
                     dateFormat="yyyy-MM-dd"
                     placeholderText="Select start date"
                     minDate={new Date()}
+                    utcOffset={new Date().getTimezoneOffset()}
                   />
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                     <FiCalendar className="text-gray-400" />
@@ -926,6 +930,7 @@ function AdminClasses() {
                     className="w-full px-3 py-2 border rounded-lg"
                     dateFormat="yyyy-MM-dd"
                     minDate={new Date()}
+
                   />
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                     <FiCalendar className="text-gray-400" />

@@ -41,10 +41,22 @@ module.exports.createClass = async (req, res) => {
     }
 }
 
+const convertToDate = (dateString) => {
+    const [day, month, year] = dateString.split('/');
+    return new Date(`${year}-${month}-${day}`);
+};
+
 module.exports.getAllClasses = async (req, res) => {
     try {
         const classes = await classesModel.find().populate('instructor');
-        return res.status(200).json({ classes: classes.map(c => ({ ...c._doc, instructor: c.instructor._doc })) });
+
+        const sortedClasses = classes.sort((a, b) => {
+            const dateA = convertToDate(a.startDate);
+            const dateB = convertToDate(b.startDate);
+            return dateA - dateB;
+        });
+
+        return res.status(200).json({ classes: sortedClasses.map(c => ({ ...c._doc, instructor: c.instructor._doc })) });
     } catch (error) {
         console.log("Error in getAllClasses Controller:", error.message);
         return res.status(500).json({ message: error.message });
