@@ -17,3 +17,13 @@ export const updateSubscription = async (data) => {
     throw error;
   }
 };
+
+export const bookClass = async (data) => {
+  try {
+    const response = await api.post('/book-class', data);
+    return response.data;
+  } catch (error) {
+    console.error('Error booking class:', error.response?.data.error || error.message);
+    throw error;
+  }
+};

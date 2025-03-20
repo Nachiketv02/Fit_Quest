@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FiClock, FiUser, FiCalendar, FiFilter, FiX } from "react-icons/fi";
 import { getClasses } from "../services/Admin/api";
+import { bookClass } from "../services/User/api";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function Classes() {
   const [activeCategory, setActiveCategory] = useState("all");
@@ -24,6 +26,17 @@ function Classes() {
   useEffect(() => {
     fetchClasses();
   }, []);
+
+  const handleBookClass = async (classesId) => {
+    try {
+      const response = await bookClass({ classesId });
+      console.log(response);
+      toast.success(response.message);
+    } catch (error) {
+      toast.error(error.response?.data.message || error.message);
+      console.error("Error booking class:", error);
+    }
+  };
 
   const categories = [
     { id: "all", name: "All Classes" },
@@ -417,7 +430,7 @@ function Classes() {
                         </ul>
                       </div>
 
-                      <button className="mt-auto w-full bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-colors">
+                      <button onClick={() => handleBookClass(classItem._id)} className="mt-auto w-full bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-colors">
                         Book Class
                       </button>
                     </div>
