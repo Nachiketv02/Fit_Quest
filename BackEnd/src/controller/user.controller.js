@@ -1,5 +1,7 @@
 const userModel = require("../model/user.model");
 const blackListTokenModel = require("../model/blackListToken.model");
+const classesModel = require("../model/admin/classes.model");
+const bookingModel = require("../model/booking.model");
 const userService = require("../service/user.service");
 const { validationResult } = require("express-validator");
 const { sendEmail } = require("../utils/sendEmail");
@@ -487,6 +489,49 @@ module.exports.updateSubscription = async (req, res) => {
     });
   } catch (error) {
     console.error("Error subscribing user:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports.bookClass = async (req, res) => {
+  try {
+    const { classesId } = req.body;
+
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const classes = await classesModel.findById(classesId);
+    if (!classes) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+
+    if (classes.enrolled >= classes.capacity) {
+      return res.status(400).json({ message: "Class is full" });
+    }
+
+    const alreadyBooked = await bookingModel.findOne({
+      userId: user._id,
+      classesId: classes._id,
+    });
+
+    if (alreadyBooked) {
+      return res.status(400).json({ message: "You have already booked this class." });
+    }
+
+    const booking = new bookingModel({
+      userId: user._id,
+      classesId: classes._id,
+    });
+
+    classes.enrolled += 1;
+    await classes.save();
+    await booking.save();
+
+    return res.status(200).json({ message: "Class booked successfully", booking });
+  } catch (error) {
+    console.error("Error booking class:", error.message);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -27,7 +27,7 @@ function Login() {
         user,
         {
           headers: { "Content-Type": "application/json" },
-          withCredentials: true,  
+          withCredentials: true,
         }
       );
       if (response.status === 200) {
@@ -38,14 +38,37 @@ function Login() {
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("token", data.token);
         setTimeout(() => {
-          if(data.user.role === "admin"){
+          if (data.user.role === "admin") {
             navigate("/admin/dashboard");
-          }else{
-            navigate("/subscription");
+          } else {
+            if (
+              data.user.subscriptionStatus === "active" &&
+              (data.user.subscription === "basic" ||
+                data.user.subscription === "basic-annual")
+            ) {
+              navigate("/subscription/basic");
+            } else if (
+              data.user.subscriptionStatus === "active" &&
+              (data.user.subscription === "premium" ||
+                data.user.subscription === "premium-annual")
+            ) {
+              navigate("/subscription/premium");
+            } else if (
+              data.user.subscriptionStatus === "active" &&
+              (data.user.subscription === "elite" ||
+                data.user.subscription === "elite-annual")
+            ) {
+              navigate("/subscription/elite");
+            } else {
+              navigate("/subscription");
+            }
           }
         }, 2000);
       } else {
-        toast.error(error.response?.data.error || "Login failed! Please try again.", { position: "top-right" });
+        toast.error(
+          error.response?.data.error || "Login failed! Please try again.",
+          { position: "top-right" }
+        );
       }
       setFormData({
         email: "",
@@ -53,7 +76,10 @@ function Login() {
       });
     } catch (error) {
       console.error("Login Error:", error);
-      toast.error(error.response?.data.error || "Login failed! Please try again.", { position: "top-right" });
+      toast.error(
+        error.response?.data.error || "Login failed! Please try again.",
+        { position: "top-right" }
+      );
     }
   };
 

@@ -34,4 +34,9 @@ router.put('/subscription',authMiddleware.isAuthenticated,[
     body("billingCycle").isIn(["monthly", "annual"]).withMessage("Invalid billing cycle")
 ],userController.updateSubscription);
 
+
+// booking
+
+router.post('/book-class',authMiddleware.isAuthenticated, userController.bookClass);
+
 module.exports = router;

@@ -140,8 +140,11 @@ function AdminClasses() {
         className: newClass.name,
         category: newClass.category,
         instructor: newClass.instructor,
-        startDate: newClass.startDate.toLocaleDateString('en-IN'),
-        times: newClass.time,
+        startDate: newClass.startDate.toLocaleDateString("en-IN"),
+        times: newClass.time.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
         duration: newClass.duration,
         capacity: newClass.capacity,
         room: newClass.room,
@@ -179,22 +182,37 @@ function AdminClasses() {
       console.error("classItem is undefined");
       return;
     }
-  
-    // Parse DD/MM/YYYY safely
+
     const [day, month, year] = classItem.startDate.split("/");
-    const parsedDate = new Date(`${year}-${month}-${day}`); // YYYY-MM-DD is safe for Date()
-  
+    const parsedDate = new Date(`${year}-${month}-${day}`);
+
+    // Convert time string like "06:00 AM" to Date object
+    const timeParts = classItem.times?.match(/(\d+):(\d+)\s?(AM|PM)/i);
+    let parsedTime = new Date();
+
+    if (timeParts) {
+      let [_, hours, minutes, meridiem] = timeParts;
+      hours = parseInt(hours);
+      minutes = parseInt(minutes);
+
+      if (meridiem.toUpperCase() === "PM" && hours < 12) hours += 12;
+      if (meridiem.toUpperCase() === "AM" && hours === 12) hours = 0;
+
+      parsedTime.setHours(hours, minutes, 0, 0);
+    } else {
+      parsedTime = null;
+    }
+
     setClassToEdit({
       ...classItem,
       className: classItem.className,
       startDate: parsedDate,
-      time: classItem.times,
+      time: parsedTime,
     });
-  
+
     setShowEditModal(true);
   };
-  
-  
+
   const handleUpdateClass = async (e) => {
     e.preventDefault();
     if (!classToEdit) {
@@ -207,14 +225,17 @@ function AdminClasses() {
         className: classToEdit.className,
         category: classToEdit.category,
         instructor: classToEdit.instructor,
-        startDate: classToEdit.startDate.toLocaleDateString('en-IN'),
-        times: classToEdit.time,
+        startDate: classToEdit.startDate.toLocaleDateString("en-IN"),
+        times: classToEdit.time.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
         duration: classToEdit.duration,
         capacity: classToEdit.capacity,
         room: classToEdit.room,
         description: classToEdit.description,
       };
-  
+
       const response = await updateClass(classToEdit._id, updatedData);
       setClassesData((prev) =>
         prev.map((cls) =>
@@ -245,7 +266,7 @@ function AdminClasses() {
 
   //get day name
   const getDayName = (dateString) => {
-    const [day, month, year] = dateString.split('/');
+    const [day, month, year] = dateString.split("/");
     const date = new Date(`${year}-${month}-${day}`);
     if (isNaN(date.getTime())) {
       throw new Error("Invalid date format. Expected format: DD/MM/YYYY");
@@ -401,7 +422,8 @@ function AdminClasses() {
                               classItem.startDate.split("T")[0]
                             )}{" "}
                             - {getDayName(classItem.startDate.split("T")[0])} */}
-                            {classItem.startDate}-{getDayName(classItem.startDate)}
+                            {classItem.startDate}-
+                            {getDayName(classItem.startDate)}
                           </div>
                           <div className="text-xs text-gray-500 mt-1 flex items-center">
                             <FiMapPin className="mr-1 text-gray-400" />
@@ -736,15 +758,15 @@ function AdminClasses() {
                   >
                     Time
                   </label>
-                  <input
-                    type="text"
-                    id="time"
-                    value={newClass.time}
-                    onChange={(e) =>
-                      setNewClass({ ...newClass, time: e.target.value })
-                    }
+                  <DatePicker
+                    selected={newClass.time}
+                    onChange={(time) => setNewClass({ ...newClass, time })}
+                    showTimeSelect
+                    showTimeSelectOnly
+                    timeIntervals={15}
+                    timeCaption="Time"
+                    dateFormat="hh:mm aa"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                    placeholder="e.g. 06:00 - 06:45"
                   />
                 </div>
 
@@ -867,7 +889,10 @@ function AdminClasses() {
                   type="text"
                   value={classToEdit.className}
                   onChange={(e) =>
-                    setClassToEdit({ ...classToEdit, className: e.target.value })
+                    setClassToEdit({
+                      ...classToEdit,
+                      className: e.target.value,
+                    })
                   }
                   className="w-full px-3 py-2 border rounded-lg"
                 />
@@ -930,7 +955,6 @@ function AdminClasses() {
                     className="w-full px-3 py-2 border rounded-lg"
                     dateFormat="yyyy-MM-dd"
                     minDate={new Date()}
-
                   />
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
                     <FiCalendar className="text-gray-400" />
@@ -943,14 +967,17 @@ function AdminClasses() {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Time
                   </label>
-                  <input
-                    type="text"
-                    value={classToEdit.time}
-                    onChange={(e) =>
-                      setClassToEdit({ ...classToEdit, time: e.target.value })
+                  <DatePicker
+                    selected={classToEdit.time}
+                    onChange={(time) =>
+                      setClassToEdit({ ...classToEdit, time })
                     }
+                    showTimeSelect
+                    showTimeSelectOnly
+                    timeIntervals={15}
+                    timeCaption="Time"
+                    dateFormat="hh:mm aa"
                     className="w-full px-3 py-2 border rounded-lg"
-                    placeholder="e.g. 06:00 - 06:45"
                   />
                 </div>
                 <div>
