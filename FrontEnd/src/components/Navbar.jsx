@@ -1,7 +1,8 @@
+import React from 'react';
 import { useState, useEffect, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiMenu, FiX, FiUser, FiLogOut } from "react-icons/fi";
+import { FiMenu, FiX, FiUser, FiLogOut, FiCalendar } from "react-icons/fi";
 import { UserDataContext } from "../context/UserContext"; 
 import axios from "axios";
 
@@ -29,7 +30,6 @@ function Navbar() {
     { name: "Membership", path: "/subscription" },
   ];
 
-  // Add plan-specific links only if the user is authenticated
   if (isAuthenticated) {
     if (userData?.subscriptionStatus === 'active' && (userData?.subscription === 'basic' || userData?.subscription === 'basic-annual')) {
       navLinks.push({ name: "Basic Plan", path: "/subscription/basic" });
@@ -125,6 +125,14 @@ function Navbar() {
                           <FiUser className="mr-2" />
                           Profile
                         </Link>
+                        <Link
+                          to="/my-classes"
+                          className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          <FiCalendar className="mr-2" />
+                          My Classes
+                        </Link>
                         <button
                           onClick={() => {
                             handleLogout();
@@ -199,6 +207,14 @@ function Navbar() {
                     >
                       <FiUser className="mr-2" />
                       Profile
+                    </Link>
+                    <Link
+                      to="/my-classes"
+                      className="flex items-center auth-button login"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <FiCalendar className="mr-2" />
+                      My Classes
                     </Link>
                     <button
                       className="flex items-center auth-button login"

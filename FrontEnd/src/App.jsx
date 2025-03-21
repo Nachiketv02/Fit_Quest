@@ -21,6 +21,7 @@ import PremiumPlan from "./pages/Plan/PremiumPlan";
 import ElitePlan from "./pages/Plan/ElitePlan";
 import MealPlan from "./components/Plan/MealPlan";
 import TrainerApplication from "./pages/TrainerApplication";
+import UserClasses from "./pages/UserClasses";
 
 //admin side
 import Dashboard from "./pages/Admin/Dashboard";
@@ -77,6 +78,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-classes"
+            element={
+              <ProtectedRoute>
+                <UserClasses />
               </ProtectedRoute>
             }
           />

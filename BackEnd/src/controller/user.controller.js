@@ -502,6 +502,10 @@ module.exports.bookClass = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    if (!user.isSubscribed) {
+      return res.status(400).json({ message: "You need to subscribe first" });
+    }
+
     const classes = await classesModel.findById(classesId);
     if (!classes) {
       return res.status(404).json({ message: "Class not found" });
@@ -535,3 +539,37 @@ module.exports.bookClass = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+module.exports.cancleClass = async(req , res) => {
+  try {
+    const { classesId } = req.body;
+
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const booking = await bookingModel.findOne({
+      userId: user._id,
+      classesId: classesId,
+    });
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    const classes = await classesModel.findById(classesId);
+    if (!classes) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+
+    classes.enrolled -= 1;
+    await classes.save();
+    await booking.deleteOne();
+
+    return res.status(200).json({ message: "Class canceled successfully" });
+  } catch (error) {
+    console.error("Error canceling class:", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}

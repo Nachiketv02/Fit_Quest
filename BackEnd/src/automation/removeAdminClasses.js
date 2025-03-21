@@ -1,6 +1,7 @@
 const classesModel = require("../model/admin/classes.model");
 const cron = require("node-cron");
 const userModel = require("../model/user.model");
+const completedClassModel = require("../model/admin/completedClasses.model");
 
 const deleteExpiredClasses = async () => {
   try {
@@ -8,32 +9,38 @@ const deleteExpiredClasses = async () => {
     const classes = await classesModel.find();
 
     const expiredClasses = classes.filter((cls) => {
-    
       if (!cls.startDate || !cls.times) return false;
-    
+
       const [day, month, year] = cls.startDate.split('/');
       if (!day || !month || !year) {
         return false;
       }
-    
+
       const timeMatch = cls.times.match(/(\d+):(\d+)\s?(AM|PM)/i);
       if (!timeMatch) {
         return false;
       }
-    
+
       let [_, hours, minutes, meridiem] = timeMatch;
       hours = parseInt(hours);
       minutes = parseInt(minutes);
-    
+
       if (meridiem.toUpperCase() === "PM" && hours < 12) hours += 12;
       if (meridiem.toUpperCase() === "AM" && hours === 12) hours = 0;
-    
+
       const classDateTimeStr = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
       const classDateTime = new Date(classDateTimeStr);
-    
+
       return classDateTime < now;
     });
 
+    // Move expired classes to the completedClassModel
+    if (expiredClasses.length > 0) {
+      await completedClassModel.insertMany(expiredClasses);
+      console.log(`Moved ${expiredClasses.length} expired classes to completed classes.`);
+    }
+
+    // Delete expired classes from the classesModel
     const result = await classesModel.deleteMany({
       _id: { $in: expiredClasses.map((cls) => cls._id) },
     });
@@ -43,7 +50,6 @@ const deleteExpiredClasses = async () => {
     console.error("Error deleting expired classes:", error);
   }
 };
-
 
 const checkSubscription = async () => {
   try {
@@ -58,7 +64,7 @@ const checkSubscription = async () => {
   }
 };
 
-cron.schedule("0 * * * *", () => {
+cron.schedule("* * * * *", () => {
   console.log("Running deleteExpiredClasses job");
   deleteExpiredClasses();
 });

@@ -39,4 +39,6 @@ router.put('/subscription',authMiddleware.isAuthenticated,[
 
 router.post('/book-class',authMiddleware.isAuthenticated, userController.bookClass);
 
+router.post('/cancle-class',authMiddleware.isAuthenticated, userController.cancleClass);
+
 module.exports = router;
