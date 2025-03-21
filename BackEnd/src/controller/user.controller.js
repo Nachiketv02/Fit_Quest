@@ -1,6 +1,7 @@
 const userModel = require("../model/user.model");
 const blackListTokenModel = require("../model/blackListToken.model");
 const classesModel = require("../model/admin/classes.model");
+const mongoose = require("mongoose");
 const bookingModel = require("../model/booking.model");
 const userService = require("../service/user.service");
 const { validationResult } = require("express-validator");
@@ -506,9 +507,13 @@ module.exports.bookClass = async (req, res) => {
       return res.status(400).json({ message: "You need to subscribe first" });
     }
 
-    const classes = await classesModel.findById(classesId);
+    const classes = await classesModel.findById(classesId, { status: "active" });
     if (!classes) {
       return res.status(404).json({ message: "Class not found" });
+    }
+
+    if (isNaN(classes.enrolled)) {
+      classes.enrolled = 0; 
     }
 
     if (classes.enrolled >= classes.capacity) {
@@ -518,6 +523,7 @@ module.exports.bookClass = async (req, res) => {
     const alreadyBooked = await bookingModel.findOne({
       userId: user._id,
       classesId: classes._id,
+      status: "booked",
     });
 
     if (alreadyBooked) {
@@ -544,6 +550,11 @@ module.exports.cancleClass = async(req , res) => {
   try {
     const { classesId } = req.body;
 
+    // Validate classesId
+    if (!classesId || !mongoose.isValidObjectId(classesId)) {
+      return res.status(400).json({ message: "Invalid class ID" });
+    }
+
     const user = await userModel.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -563,9 +574,13 @@ module.exports.cancleClass = async(req , res) => {
       return res.status(404).json({ message: "Class not found" });
     }
 
+    // Decrement the enrolled count
     classes.enrolled -= 1;
     await classes.save();
-    await booking.deleteOne();
+
+    // Update the booking status to "cancelled"
+    booking.status = "cancelled";
+    await booking.save();
 
     return res.status(200).json({ message: "Class canceled successfully" });
   } catch (error) {
@@ -573,3 +588,42 @@ module.exports.cancleClass = async(req , res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 }
+
+module.exports.upcomingClasses = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const bookings = await bookingModel.find({
+      userId: user._id,
+      status: "booked"
+    }).populate('classesId');
+    const classes = bookings.map(booking => booking.classesId);
+    return res.status(200).json({ classes });
+  } catch (error) {
+    console.error("Error fetching upcoming classes:", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports.pastClasses = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const bookings = await bookingModel.find({
+      userId: user._id,
+      status: "completed"
+    }).populate('classesId');
+    const classes = bookings.map(booking => booking.classesId);
+    return res.status(200).json({ classes });
+  } catch (error) {
+    console.error("Error fetching past classes:", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+

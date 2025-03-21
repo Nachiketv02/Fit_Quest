@@ -1,7 +1,7 @@
 const classesModel = require("../model/admin/classes.model");
 const cron = require("node-cron");
 const userModel = require("../model/user.model");
-const completedClassModel = require("../model/admin/completedClasses.model");
+const bookingModel = require("../model/booking.model");
 
 const deleteExpiredClasses = async () => {
   try {
@@ -34,20 +34,22 @@ const deleteExpiredClasses = async () => {
       return classDateTime < now;
     });
 
-    // Move expired classes to the completedClassModel
-    if (expiredClasses.length > 0) {
-      await completedClassModel.insertMany(expiredClasses);
-      console.log(`Moved ${expiredClasses.length} expired classes to completed classes.`);
-    }
-
     // Delete expired classes from the classesModel
-    const result = await classesModel.deleteMany({
-      _id: { $in: expiredClasses.map((cls) => cls._id) },
-    });
+    const result = await classesModel.updateMany(
+      { _id: { $in: expiredClasses.map((cls) => cls._id) } },
+      { $set: { status: "inactive" } }
+    );
 
-    console.log(`Deleted ${result.deletedCount} expired classes.`);
+    // Update bookings for expired classes
+    await bookingModel.updateMany(
+      { classesId: { $in: expiredClasses.map((cls) => cls._id) } },
+      { $set: { status: "completed" } }
+    );
+
+    console.log(`Updated ${result.modifiedCount} expired classes.`);
+    console.log(`Updated ${result.modifiedCount} bookings for expired classes.`);
   } catch (error) {
-    console.error("Error deleting expired classes:", error);
+    console.error("Error updating expired classes:", error);
   }
 };
 
@@ -64,7 +66,7 @@ const checkSubscription = async () => {
   }
 };
 
-cron.schedule("* * * * *", () => {
+cron.schedule("0 * * * *", () => {
   console.log("Running deleteExpiredClasses job");
   deleteExpiredClasses();
 });

@@ -50,6 +50,11 @@ const classSchema = new mongoose.Schema({
         minLength : [3,"Minimum length is 3"],
         maxLength : [100,"Maximum length is 100"]
     },
+    status : {
+        type : String,
+        enum : ["active", "inactive"],
+        default : "active"
+    },
     createdAt : {
         type : Date,
         required : true,

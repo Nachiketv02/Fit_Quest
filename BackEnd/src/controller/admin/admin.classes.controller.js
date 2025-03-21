@@ -48,7 +48,7 @@ const convertToDate = (dateString) => {
 
 module.exports.getAllClasses = async (req, res) => {
     try {
-        const classes = await classesModel.find().populate('instructor');
+        const classes = await classesModel.find({ status: "active" }).populate('instructor');
 
         const sortedClasses = classes.sort((a, b) => {
             const dateA = convertToDate(a.startDate);
@@ -67,7 +67,8 @@ module.exports.searchClasses = async (req, res) => {
     try {
         const { q } = req.query;
         const classes = await classesModel.find({
-            className: { $regex: q, $options: "i" }
+            className: { $regex: q, $options: "i" },
+            status: "active"
         });
         return res.status(200).json({ classes });
     } catch (error) {
@@ -88,7 +89,7 @@ module.exports.updateClass = async (req, res) => {
             return res.status(400).json({ error: "All fields are required" });
         }
 
-        const existingClass = await classesModel.findOne({ instructor, startDate, times, room });
+        const existingClass = await classesModel.findOne({ instructor, startDate, times, room, status: "active" });
         if (existingClass && existingClass._id.toString() !== req.params.id) {
             return res.status(400).json({ error: "Class already exists" });
         }

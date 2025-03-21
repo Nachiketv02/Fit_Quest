@@ -15,11 +15,11 @@ const bookingSchema = new mongoose.Schema({
     type: Date, 
     default: Date.now 
   },
-  status : {
-    type : String,
-    enum : ["confirmed", "completed", "cancelled"],
-    default : "confirmed"
-  }
+  status: {
+    type: String,
+    enum: ["booked", "cancelled", "completed"],
+    default: "booked",
+  },
 });
 
 bookingSchema.index({ userId: 1, classesId: 1 }, { unique: true });

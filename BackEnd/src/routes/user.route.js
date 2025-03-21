@@ -41,4 +41,8 @@ router.post('/book-class',authMiddleware.isAuthenticated, userController.bookCla
 
 router.post('/cancle-class',authMiddleware.isAuthenticated, userController.cancleClass);
 
+router.get('/upcoming-classes',authMiddleware.isAuthenticated, userController.upcomingClasses);
+
+router.get('/past-classes',authMiddleware.isAuthenticated, userController.pastClasses);
+
 module.exports = router;
