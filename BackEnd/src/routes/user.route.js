@@ -39,7 +39,9 @@ router.put('/subscription',authMiddleware.isAuthenticated,[
 
 router.post('/book-class',authMiddleware.isAuthenticated, userController.bookClass);
 
-router.post('/cancle-class',authMiddleware.isAuthenticated, userController.cancleClass);
+router.post('/cancel-class',authMiddleware.isAuthenticated, userController.cancelClass);
+
+router.get('/cancelled-classes',authMiddleware.isAuthenticated, userController.getCancelledClasses);
 
 router.get('/upcoming-classes',authMiddleware.isAuthenticated, userController.upcomingClasses);
 

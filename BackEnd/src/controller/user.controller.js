@@ -546,7 +546,7 @@ module.exports.bookClass = async (req, res) => {
   }
 };
 
-module.exports.cancleClass = async(req , res) => {
+module.exports.cancelClass = async(req , res) => {
   try {
     const { classesId } = req.body;
 
@@ -563,6 +563,7 @@ module.exports.cancleClass = async(req , res) => {
     const booking = await bookingModel.findOne({
       userId: user._id,
       classesId: classesId,
+      status: "booked",
     });
 
     if (!booking) {
@@ -589,6 +590,30 @@ module.exports.cancleClass = async(req , res) => {
   }
 }
 
+module.exports.getCancelledClasses = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const bookings = await bookingModel.find({
+      userId: user._id,
+      status: "cancelled"
+    }).populate({
+      path: 'classesId', 
+      populate: {
+        path: 'instructor', 
+      }
+    });
+
+    const classes = bookings.map(booking => booking.classesId);
+    return res.status(200).json({ classes });
+  } catch (error) {
+    console.error("Error fetching cancelled classes:", error.message);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports.upcomingClasses = async (req, res) => {
   try {
     const user = await userModel.findById(req.user._id);
@@ -598,7 +623,12 @@ module.exports.upcomingClasses = async (req, res) => {
     const bookings = await bookingModel.find({
       userId: user._id,
       status: "booked"
-    }).populate('classesId');
+    }).populate({
+      path: 'classesId', 
+      populate: {
+        path: 'instructor', 
+      }
+    });
     const classes = bookings.map(booking => booking.classesId);
     return res.status(200).json({ classes });
   } catch (error) {
@@ -616,7 +646,12 @@ module.exports.pastClasses = async (req, res) => {
     const bookings = await bookingModel.find({
       userId: user._id,
       status: "completed"
-    }).populate('classesId');
+    }).populate({
+      path: 'classesId', 
+      populate: {
+        path: 'instructor', 
+      }
+    });
     const classes = bookings.map(booking => booking.classesId);
     return res.status(200).json({ classes });
   } catch (error) {
