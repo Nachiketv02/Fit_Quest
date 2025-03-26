@@ -13,7 +13,7 @@ require("./automation/removeAdminClasses");
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://fit-quest-phi.vercel.app"],
+    origin: ["*"],
     credentials: true,
   })
 );
