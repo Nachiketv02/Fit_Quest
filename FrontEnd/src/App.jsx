@@ -28,7 +28,8 @@ import Dashboard from "./pages/Admin/Dashboard";
 import Members from "./pages/Admin/Members";
 import AdminClasses from "./pages/Admin/AdminClasses";
 import InstructorsPage from "./pages/Admin/InstructorsPage";
-
+import Settings from "./pages/Admin/Settings";
+import Subscriptions from "./pages/Admin/Subscriptions";
 
 function App() {
   return (
@@ -102,6 +103,8 @@ function App() {
           <Route path="/admin/members" element={<Members />} />
           <Route path="/admin/classes" element={<AdminClasses />} />
           <Route path="/admin/instructors" element={<InstructorsPage />} />
+          <Route path="/admin/settings" element={<Settings />} />
+          <Route path="/admin/subscriptions" element={<Subscriptions />} />
         </Routes>
         <Footer />
       </div>

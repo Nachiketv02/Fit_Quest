@@ -11,8 +11,8 @@ function AdminSidebar({ isMobile, isOpen, onClose }) {
     { name: 'Members', icon: FiUsers, path: '/admin/members' },
     { name: 'Classes', icon: FiCalendar, path: '/admin/classes' },
     { name: 'Subscriptions', icon: FiDollarSign, path: '/admin/subscriptions' },
-    { name: 'Reports', icon: FiBarChart2, path: '/admin/reports' },
-    { name: 'Settings', icon: FiSettings, path: '/admin/settings' },
+    // { name: 'Reports', icon: FiBarChart2, path: '/admin/reports' },
+    // { name: 'Settings', icon: FiSettings, path: '/admin/settings' },
   ];
   
   const isActive = (path) => {
@@ -21,6 +21,7 @@ function AdminSidebar({ isMobile, isOpen, onClose }) {
   
   const sidebarContent = (
     <>
+    
       <div className="flex items-center justify-between p-4 border-b border-gray-200 mt-5">
         <Link to="/admin/dashboard" className="flex items-center">
           <span className="text-gradient font-bold text-xl">Fit</span>
