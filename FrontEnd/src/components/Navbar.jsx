@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 import { useState, useEffect, useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiMenu, FiX, FiUser, FiLogOut, FiCalendar } from "react-icons/fi";
-import { UserDataContext } from "../context/UserContext"; 
+import { UserDataContext } from "../context/UserContext";
 import axios from "axios";
 
 function Navbar() {
@@ -12,7 +12,8 @@ function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, setIsAuthenticated, userData } = useContext(UserDataContext);
+  const { isAuthenticated, setIsAuthenticated, userData } =
+    useContext(UserDataContext);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,27 +31,50 @@ function Navbar() {
     { name: "Membership", path: "/subscription" },
   ];
 
+  const adminQuickLinks = [
+    { name: "Dashboard", path: "/admin/dashboard" },
+  ];
+
+  if (isAuthenticated && userData?.role === "admin") {
+    navLinks.push({ name: "Dashboard", path: "/admin/dashboard" });
+  }
+
   if (isAuthenticated) {
-    if (userData?.subscriptionStatus === 'active' && (userData?.subscription === 'basic' || userData?.subscription === 'basic-annual')) {
+    if (
+      userData?.subscriptionStatus === "active" &&
+      (userData?.subscription === "basic" ||
+        userData?.subscription === "basic-annual")
+    ) {
       navLinks.push({ name: "Basic Plan", path: "/subscription/basic" });
-    } else if (userData?.subscriptionStatus === 'active' && (userData?.subscription === 'premium' || userData?.subscription === 'premium-annual')) {
+    } else if (
+      userData?.subscriptionStatus === "active" &&
+      (userData?.subscription === "premium" ||
+        userData?.subscription === "premium-annual")
+    ) {
       navLinks.push({ name: "Premium Plan", path: "/subscription/premium" });
-    } else if (userData?.subscriptionStatus === 'active' && (userData?.subscription === 'elite' || userData?.subscription === 'elite-annual')) {
+    } else if (
+      userData?.subscriptionStatus === "active" &&
+      (userData?.subscription === "elite" ||
+        userData?.subscription === "elite-annual")
+    ) {
       navLinks.push({ name: "Elite Plan", path: "/subscription/elite" });
     }
   }
 
   const handleLogout = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/fit-quest/users/logout`, { withCredentials: true });
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/fit-quest/users/logout`,
+        { withCredentials: true }
+      );
       if (response.status === 200) {
         setIsAuthenticated(false);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/');
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/");
       }
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
   };
 
@@ -82,9 +106,7 @@ function Navbar() {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`nav-link ${
-                    location.pathname === link.path ? "active" : ""
-                  }`}
+                  className={`nav-link ${location.pathname === link.path ? "active" : ""}`}
                 >
                   {link.name}
                 </Link>

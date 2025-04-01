@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CreditCard, Check, DollarSign, Users } from 'lucide-react';
+import { CreditCard, Check, IndianRupee, Users } from 'lucide-react';
 import AdminSidebar from '../../components/Admin/AdminSidebar';
 import AdminHeader from '../../components/Admin/AdminHeader';
 
@@ -108,7 +108,7 @@ function Subscriptions() {
               {activeSubscriptions.map((subscription) => (
                 <motion.div
                   key={subscription.id}
-                  className="bg-white rounded-xl shadow-md p-6"
+                  className="bg-white rounded-xl shadow-md p-6 h-full"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: subscription.id * 0.1 }}
@@ -128,8 +128,8 @@ function Subscriptions() {
                     <div className="flex items-center justify-between">
                       <span className="text-gray-600">Monthly Revenue</span>
                       <div className="flex items-center">
-                        <DollarSign className="h-4 w-4 text-gray-400 mr-1" />
-                        <span className="font-medium">${subscription.revenue}</span>
+                        <IndianRupee className="h-4 w-4 text-gray-400 mr-1" />
+                        <span className="font-medium">{subscription.revenue}</span>
                       </div>
                     </div>
                   </div>
@@ -142,7 +142,7 @@ function Subscriptions() {
               {plans.map((plan) => (
                 <motion.div
                   key={plan.id}
-                  className={`bg-white rounded-xl shadow-md overflow-hidden ${
+                  className={`flex flex-col h-full bg-white rounded-xl shadow-md overflow-hidden ${
                     plan.popular ? 'ring-2 ring-primary' : ''
                   }`}
                   initial={{ opacity: 0, y: 20 }}
@@ -154,22 +154,24 @@ function Subscriptions() {
                       Most Popular
                     </div>
                   )}
-                  <div className="p-6">
-                    <h3 className="text-xl font-bold text-gray-800">{plan.name}</h3>
-                    <p className="text-gray-500 text-sm mt-1">{plan.description}</p>
-                    <div className="mt-4 flex items-baseline">
-                      <span className="text-4xl font-bold text-gray-800">${plan.price}</span>
-                      <span className="text-gray-500 ml-1">/{plan.period}</span>
+                  <div className="p-6 flex flex-col flex-grow">
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-800">{plan.name}</h3>
+                      <p className="text-gray-500 text-sm mt-1">{plan.description}</p>
+                      <div className="mt-4 flex items-baseline">
+                        <span className="text-4xl font-bold text-gray-800">${plan.price}</span>
+                        <span className="text-gray-500 ml-1">/{plan.period}</span>
+                      </div>
+                      <ul className="mt-6 space-y-4">
+                        {plan.features.map((feature, index) => (
+                          <li key={index} className="flex items-start">
+                            <Check className="h-5 w-5 text-green-500 mr-2" />
+                            <span className="text-gray-600">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <ul className="mt-6 space-y-4">
-                      {plan.features.map((feature, index) => (
-                        <li key={index} className="flex items-start">
-                          <Check className="h-5 w-5 text-green-500 mr-2" />
-                          <span className="text-gray-600">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <button className={`mt-8 w-full py-3 px-4 rounded-lg text-white ${plan.color} hover:opacity-90 transition-opacity`}>
+                    <button className={`mt-auto w-full py-3 px-4 rounded-lg text-white ${plan.color} hover:opacity-90 transition-opacity`}>
                       Edit Plan
                     </button>
                   </div>
