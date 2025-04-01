@@ -1,41 +1,106 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Users, Calendar, Activity,
-  PieChart, Menu, Clock, Dumbbell
+  PieChart, Clock, Dumbbell 
 } from 'lucide-react';
+import {getTotalMembers , getTotalBookings , getTotalSubscriptions , getClassesSchedule , getRecentMembers , getPopularClasses} from '../../services/Admin/api';
 import AdminSidebar from '../../components/Admin/AdminSidebar';
 import AdminHeader from '../../components/Admin/AdminHeader';
 
 function Dashboard() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [totalMembers, setTotalMembers] = useState(0);
+  const [totalBookings, setTotalBookings] = useState(0);
+  const [totalSubscriptions, setTotalSubscriptions] = useState(0);
+  const [classesSchedule, setClassesSchedule] = useState([]);
+  const [recentMembers, setRecentMembers] = useState([]);
+  const [popularClasses, setPopularClasses] = useState([]);
+
+  const fetchTotalMembers = async () => {
+    try {
+      const data = await getTotalMembers();
+      setTotalMembers(data.users);
+    } catch (error) {
+      console.error('Error fetching total members:', error);
+    }
+  };
+
+  const fetchTotalBookings = async () => {
+    try {
+      const data = await getTotalBookings();
+      setTotalBookings(data.bookings);
+    } catch (error) {
+      console.error('Error fetching total bookings:', error);
+    }
+  };
+
+  const fetchTotalSubscriptions = async () => {
+    try {
+      const data = await getTotalSubscriptions();
+      setTotalSubscriptions(data.subscriptions);
+    } catch (error) {
+      console.error('Error fetching total subscriptions:', error);
+    }
+  };
+
+  const fetchClassesSchedule = async () => {
+    try {
+      const data = await getClassesSchedule();
+      setClassesSchedule(data.classes);
+    } catch (error) {
+      console.error('Error fetching classes schedule:', error);
+    }
+  };
+
+  const fetchRecentMembers = async () => {
+    try {
+      const data = await getRecentMembers();
+      setRecentMembers(data.members);
+    } catch (error) {
+      console.error('Error fetching recent members:', error);
+    }
+  };
+
+  const fetchPopularClasses = async () => {
+    try {
+      const data = await getPopularClasses();
+      setPopularClasses(data);
+    } catch (error) { 
+      console.error('Error fetching popular classes:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTotalMembers();
+    fetchTotalBookings();
+    fetchTotalSubscriptions();
+    fetchClassesSchedule();
+    fetchRecentMembers();
+    fetchPopularClasses();
+  }, []);
 
   // Sample data for dashboard
   const stats = [
-    { id: 1, name: 'Total Members', value: '1,248', icon: Users, change: '+12%', color: 'bg-blue-500' },
-    { id: 2, name: 'Class Attendance', value: '3,879', icon: Calendar, change: '+15%', color: 'bg-purple-500' },
-    { id: 3, name: 'New Signups', value: '89', icon: Activity, change: '+23%', color: 'bg-orange-500' },
+    { id: 1, name: 'Total Members', value: totalMembers, icon: Users, change: '+12%', color: 'bg-blue-500' },
+    { id: 2, name: 'Total Class Bookings', value: totalBookings, icon: Calendar, change: '+15%', color: 'bg-purple-500' },
+    { id: 3, name: 'Total Subscriptions', value: totalSubscriptions, icon: Activity, change: '+23%', color: 'bg-orange-500' },
   ];
 
-  const recentMembers = [
-    { id: 1, name: 'Sarah Johnson', email: 'sarah.j@example.com', plan: 'Premium', joinDate: '2023-05-15', image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=50&h=50&fit=crop' },
-    { id: 2, name: 'Michael Chen', email: 'michael.c@example.com', plan: 'Elite', joinDate: '2023-05-14', image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=50&h=50&fit=crop' },
-    { id: 3, name: 'Emily Rodriguez', email: 'emily.r@example.com', plan: 'Basic', joinDate: '2023-05-12', image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=50&h=50&fit=crop' },
-  ];
+  // const popularClasses = [
+  //   { id: 1, name: 'Power Yoga', attendees: 450, trend: '+15%', icon: '🧘‍♀️' },
+  //   { id: 2, name: 'HIIT Training', attendees: 380, trend: '+12%', icon: '💪' },
+  //   { id: 3, name: 'Spinning', attendees: 320, trend: '+8%', icon: '🚲' },
+  //   { id: 4, name: 'Zumba', attendees: 290, trend: '+5%', icon: '💃' },
+  // ];
 
-  const popularClasses = [
-    { id: 1, name: 'Power Yoga', attendees: 450, trend: '+15%', icon: '🧘‍♀️' },
-    { id: 2, name: 'HIIT Training', attendees: 380, trend: '+12%', icon: '💪' },
-    { id: 3, name: 'Spinning', attendees: 320, trend: '+8%', icon: '🚲' },
-    { id: 4, name: 'Zumba', attendees: 290, trend: '+5%', icon: '💃' },
-  ];
-
-  const todaysSchedule = [
-    { id: 1, time: '06:00', class: 'Morning Yoga', instructor: 'Sarah Lee', status: 'In Progress' },
-    { id: 2, time: '08:00', class: 'CrossFit', instructor: 'Mike Johnson', status: 'Upcoming' },
-    { id: 3, time: '10:00', class: 'Pilates', instructor: 'Emma Davis', status: 'Upcoming' },
-    { id: 4, time: '12:00', class: 'Boxing', instructor: 'James Wilson', status: 'Upcoming' },
-  ];
+  const dateFormat = (date) => {
+    return new Date(date).toLocaleDateString('en-In', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
@@ -96,7 +161,7 @@ function Dashboard() {
                   <Dumbbell className="text-gray-400" size={20} />
                 </div>
                 <div className="space-y-4">
-                  {popularClasses.map((item) => (
+                  {popularClasses.length > 0 ? (popularClasses.map((item) => (
                     <div key={item.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                       <div className="flex items-center">
                         <span className="text-2xl mr-4">{item.icon}</span>
@@ -107,7 +172,9 @@ function Dashboard() {
                       </div>
                       <span className="text-green-500 text-sm font-medium">{item.trend}</span>
                     </div>
-                  ))}
+                  ))): (
+                    <p className="text-gray-500">No popular classes found</p>
+                  )}
                 </div>
               </motion.div>
 
@@ -119,17 +186,21 @@ function Dashboard() {
                 transition={{ delay: 0.4 }}
               >
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-semibold text-gray-800">Today's Schedule</h2>
+                  <h2 className="text-lg font-semibold text-gray-800">Classes Schedule</h2>
                   <Clock className="text-gray-400" size={20} />
                 </div>
                 <div className="space-y-4">
-                  {todaysSchedule.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <div className="w-16 text-sm font-medium text-gray-600">{item.time}</div>
+                  {classesSchedule.length > 0 ? (
+                    classesSchedule.map((item) => (
+                      <div key={item._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div className="flex gap-4 items-center space-x-4">
+                        <div className="w-16 text-sm font-medium text-gray-600">{item.times}
+                          <br />
+                          {item.startDate}
+                        </div>
                         <div>
-                          <h3 className="font-medium text-gray-800">{item.class}</h3>
-                          <p className="text-sm text-gray-500">{item.instructor}</p>
+                          <h3 className="font-medium text-gray-800">{item.className}</h3>
+                          <p className="text-sm text-gray-500">{item.instructor.fullName}</p>
                         </div>
                       </div>
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -138,7 +209,10 @@ function Dashboard() {
                         {item.status}
                       </span>
                     </div>
-                  ))}
+                  ))
+                  ) : (
+                    <p className="text-gray-500">No classes scheduled</p>
+                  )}
                 </div>
               </motion.div>
             </div>
@@ -167,29 +241,29 @@ function Dashboard() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {recentMembers.map((member) => (
-                      <tr key={member.id} className="hover:bg-gray-50">
+                      <tr key={member._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <img className="h-10 w-10 rounded-full" src={member.image} alt="" />
+                            {/* <img className="h-10 w-10 rounded-full" src={member.image} alt="" /> */}
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">{member.name}</div>
+                              <div className="text-sm font-medium text-gray-900">{member.fullName}</div>
                               <div className="text-sm text-gray-500">{member.email}</div>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            member.plan === 'Elite' 
+                            member.subscription === 'elite' || member.subscription === 'elite-annual'
                               ? 'bg-purple-100 text-purple-800' 
-                              : member.plan === 'Premium' 
+                              : member.subscription === 'premium' || member.subscription === 'premium-annual' 
                                 ? 'bg-blue-100 text-blue-800' 
                                 : 'bg-gray-100 text-gray-800'
                           }`}>
-                            {member.plan}
+                            {member.subscription}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {member.joinDate}
+                          {dateFormat(member.subscriptionStartDate)}
                         </td>
                       </tr>
                     ))}

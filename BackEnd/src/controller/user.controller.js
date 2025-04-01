@@ -507,13 +507,9 @@ module.exports.bookClass = async (req, res) => {
       return res.status(400).json({ message: "You need to subscribe first" });
     }
 
-    const classes = await classesModel.findById(classesId, { status: "active" });
+    const classes = await classesModel.findOne({ _id: classesId, status: "active" });
     if (!classes) {
-      return res.status(404).json({ message: "Class not found" });
-    }
-
-    if (isNaN(classes.enrolled)) {
-      classes.enrolled = 0; 
+      return res.status(404).json({ message: "Class not found or not active" });
     }
 
     if (classes.enrolled >= classes.capacity) {
@@ -530,13 +526,13 @@ module.exports.bookClass = async (req, res) => {
       return res.status(400).json({ message: "You have already booked this class." });
     }
 
+    classes.enrolled += 1;
+    await classes.save();
+
     const booking = new bookingModel({
       userId: user._id,
       classesId: classes._id,
     });
-
-    classes.enrolled += 1;
-    await classes.save();
     await booking.save();
 
     return res.status(200).json({ message: "Class booked successfully", booking });

@@ -54,7 +54,7 @@ function Home() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
-                navigate('/login');
+                  navigate('/login');
                 }}
               >
                 Start Your Journey

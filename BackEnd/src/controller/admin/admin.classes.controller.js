@@ -48,15 +48,9 @@ const convertToDate = (dateString) => {
 
 module.exports.getAllClasses = async (req, res) => {
     try {
-        const classes = await classesModel.find({ status: "active" }).populate('instructor');
+        const classes = await classesModel.find({ status: "active" }).sort({ startDate: 1 , times: 1 }).populate('instructor');
 
-        const sortedClasses = classes.sort((a, b) => {
-            const dateA = convertToDate(a.startDate);
-            const dateB = convertToDate(b.startDate);
-            return dateA - dateB;
-        });
-
-        return res.status(200).json({ classes: sortedClasses.map(c => ({ ...c._doc, instructor: c.instructor._doc })) });
+        return res.status(200).json({ classes });
     } catch (error) {
         console.log("Error in getAllClasses Controller:", error.message);
         return res.status(500).json({ message: error.message });

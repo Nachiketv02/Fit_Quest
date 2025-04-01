@@ -33,7 +33,6 @@ const classSchema = new mongoose.Schema({
     capacity : {
         type : Number,
         required : true,
-
     },
     room : {
         type : String,

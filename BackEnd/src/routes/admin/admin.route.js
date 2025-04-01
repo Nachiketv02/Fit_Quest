@@ -5,6 +5,22 @@ const {body} = require("express-validator");
 const adminInstructorsController = require("../../controller/admin/admin.instructors.controller");
 const adminClassesController = require("../../controller/admin/admin.classes.controller");
 const adminMembersController = require("../../controller/admin/admin.member.controller");
+const dashboardController = require("../../controller/admin/dashboard.controller");
+
+
+//dashbord
+
+router.get("/dashboard/members", authMiddleware.isAuthenticated, authMiddleware.isAdmin ,dashboardController.getTotalMembers);
+
+router.get("/dashboard/bookings", authMiddleware.isAuthenticated, authMiddleware.isAdmin ,dashboardController.getTotalBookings);
+
+router.get("/dashboard/subscriptions", authMiddleware.isAuthenticated, authMiddleware.isAdmin ,dashboardController.getTotalSubscriptions);
+
+router.get('/dashboard/classes-schedule', authMiddleware.isAuthenticated, authMiddleware.isAdmin ,dashboardController.getClassSchedule);
+
+router.get('/dashboard/recent-members', authMiddleware.isAuthenticated, authMiddleware.isAdmin ,dashboardController.getRecentMembers);
+
+router.get('/dashboard/popular-classes', authMiddleware.isAuthenticated, authMiddleware.isAdmin ,dashboardController.getPopularClasses);
 
 //instructors
 

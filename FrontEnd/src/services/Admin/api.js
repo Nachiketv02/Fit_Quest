@@ -8,6 +8,75 @@ const api = axios.create({
   withCredentials: true,
 });
 
+//dashboard
+
+export const getTotalMembers = async () => {
+  try {
+    const response = await api.get('/dashboard/members');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching total members:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getTotalBookings = async () => {
+  try {
+    const response = await api.get('/dashboard/bookings');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching total bookings:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getTotalSubscriptions = async () => {
+  try {
+    const response = await api.get('/dashboard/subscriptions');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching total subscriptions:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getClassesSchedule = async () => {
+  try {
+    const response = await api.get('/dashboard/classes-schedule');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching classes schedule:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getRecentMembers = async () => {
+  try {
+    const response = await api.get('/dashboard/recent-members');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching recent members:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getPopularClasses = async () => {
+  try {
+    const response = await api.get('/dashboard/popular-classes');
+    // console.log(response.data.popularClasses);
+    if (response.status === 200) {
+      return response.data.popularClasses;
+    } else {
+      throw new Error('Failed to fetch popular classes');
+    }
+  } catch (error) {
+    console.error('Error fetching popular classes:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+
+//instructors
 export const getInstructors = async (page = 1, limit = 5) => {
   try {
     const response = await api.get(`/instructors?page=${page}&limit=${limit}`);
