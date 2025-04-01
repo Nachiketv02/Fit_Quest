@@ -10,7 +10,7 @@ function AdminSidebar({ isMobile, isOpen, onClose }) {
     { name: 'Instructors', icon: FiUserCheck, path: '/admin/instructors' },
     { name: 'Members', icon: FiUsers, path: '/admin/members' },
     { name: 'Classes', icon: FiCalendar, path: '/admin/classes' },
-    { name: 'Subscriptions', icon: FiDollarSign, path: '/admin/subscriptions' },
+    // { name: 'Subscriptions', icon: FiDollarSign, path: '/admin/subscriptions' },
     // { name: 'Reports', icon: FiBarChart2, path: '/admin/reports' },
     // { name: 'Settings', icon: FiSettings, path: '/admin/settings' },
   ];

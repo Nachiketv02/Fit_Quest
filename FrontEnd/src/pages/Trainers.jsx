@@ -323,31 +323,6 @@ function Trainers() {
           </div>
         </div>
       </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-primary">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl font-bold text-white mb-6">
-              Ready to Start Your Fitness Journey?
-            </h2>
-            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-              Book a free consultation with one of our expert trainers today!
-            </p>
-            <motion.button 
-              className="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Book Consultation
-            </motion.button>
-          </motion.div>
-        </div>
-      </section>
     </div>
   );
 }

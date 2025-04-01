@@ -60,7 +60,7 @@ function Subscription() {
       {
         id: 'basic',
         name: 'Basic',
-        price: 49.99,
+        price: 499,
         description: 'Perfect for beginners starting their fitness journey',
         features: [
           { text: 'Access to gym facilities', included: true },
@@ -78,7 +78,7 @@ function Subscription() {
       {
         id: 'premium',
         name: 'Premium',
-        price: 79.99,
+        price: 999,
         description: 'Our most popular plan for fitness enthusiasts',
         features: [
           { text: 'Access to gym facilities', included: true },
@@ -96,7 +96,7 @@ function Subscription() {
       {
         id: 'elite',
         name: 'Elite',
-        price: 119.99,
+        price: 1499,
         description: 'Comprehensive plan for serious fitness goals',
         features: [
           { text: 'Access to gym facilities', included: true },
@@ -116,7 +116,7 @@ function Subscription() {
       {
         id: 'basic-annual',
         name: 'Basic',
-        price: 39.99,
+        price: 399,
         description: 'Perfect for beginners starting their fitness journey',
         features: [
           { text: 'Access to gym facilities', included: true },
@@ -135,7 +135,7 @@ function Subscription() {
       {
         id: 'premium-annual',
         name: 'Premium',
-        price: 59.99,
+        price: 799,
         description: 'Our most popular plan for fitness enthusiasts',
         features: [
           { text: 'Access to gym facilities', included: true },
@@ -154,7 +154,7 @@ function Subscription() {
       {
         id: 'elite-annual',
         name: 'Elite',
-        price: 89.99,
+        price: 1299,
         description: 'Comprehensive plan for serious fitness goals',
         features: [
           { text: 'Access to gym facilities', included: true },
@@ -283,7 +283,7 @@ function Subscription() {
                   <p className="text-gray-600 mb-6">{plan.description}</p>
                   
                   <div className="mb-6">
-                    <span className="text-4xl font-bold">${plan.price}</span>
+                    <span className="text-4xl font-bold">₹{plan.price}</span>
                     <span className="text-gray-600 ml-2">/ month</span>
                     {plan.savings && (
                       <div className="mt-2">
