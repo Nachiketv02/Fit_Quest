@@ -101,12 +101,12 @@ userSchema.statics.hashPassword = async function(password) {
     return await bcrypt.hash(password, 10);
 }
 
-userSchema.methods.generateVerificationCode = async function(){
-    const code = crypto.randomInt(Math.pow(10, 5),Math.pow(10, 6)).toString();
-    this.verificationCode = code;
-    this.verificationCodeExpires = Date.now() + 5 * 60 * 1000; //5 minutes
-    return code;
-}
+    userSchema.methods.generateVerificationCode = async function(){
+        const code = crypto.randomInt(Math.pow(10, 5),Math.pow(10, 6)).toString();
+        this.verificationCode = code;
+        this.verificationCodeExpires = Date.now() + 5 * 60 * 1000; //5 minutes
+        return code;
+    }
 
 userSchema.methods.generateResetPasswordToken = async function(){
     const resetToken = crypto.randomBytes(32).toString("hex");
