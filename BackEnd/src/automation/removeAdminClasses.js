@@ -66,6 +66,7 @@ const checkSubscription = async () => {
   }
 };
 
+
 cron.schedule("0 * * * *", () => {
   console.log("Running deleteExpiredClasses job");
   deleteExpiredClasses();
